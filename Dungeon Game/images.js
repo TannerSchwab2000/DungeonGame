@@ -3,6 +3,7 @@ function img(s,x,y,w,h,n,z){
     this.x = x;
     this.y = y;
     this.img = document.createElement("IMG");
+    this.img.realSrc = s;
     this.img.src = s;
     this.img.width = 100*w;
     this.img.height = 100*h;
@@ -21,7 +22,7 @@ function img(s,x,y,w,h,n,z){
         if(this.green == true){  
             this.img.src = "assets/stone_floor_green.png";
         }else{
-            this.img.src = s;     
+            this.img.src = this.img.realSrc;     
         }
         this.pos.innerHTML = '.cssClass' + n + '{  position: fixed; left: ' + this.x*100 +';' + "top: " + this.y*100 + ';' + 'z-index: '+ z +'}'; 
         document.getElementsByTagName('head')[0].appendChild(this.pos);

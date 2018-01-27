@@ -8,6 +8,8 @@ function tile(s,x,y,parent,t){
     this.pos = createVector(x+parent.pos.x,y+parent.pos.y);
     this.sprite = new img(s,this.pos.x,this.pos.y,1,1,images.length,0);
     this.t = t;
+    this.relativeX = x;
+    this.relativeY = y;
     images.push(this.sprite);
 
     this.render = function(){

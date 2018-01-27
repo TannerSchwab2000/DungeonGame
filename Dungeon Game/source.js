@@ -70,7 +70,11 @@ function draw() {
         lastTick = Date.now();
         for(var a=0;a<rooms.length;a++){
             for(var b=0;b<rooms[a].tiles.length;b++){
-                rooms[a].tiles[b].render()
+                var distance = abs(rooms[a].tiles[b].pos.x - player.pos.x)+abs(rooms[a].tiles[b].pos.y - player.pos.y);
+                if(distance<20){
+                    rooms[a].tiles[b].render()
+                }
+                
             }
         }    
 
@@ -92,25 +96,64 @@ function mouseClicked(){
                         done = true;     
                         energy = energy - distance*2; 
                         if(rooms[a].tiles[b].t == 'door'){
-                            rooms[a].tiles.splice(b,1);
-                            rooms.push(new room(rooms[a].pos.x+9,rooms[a].pos.y));
-                            for(var c=0;c<10;c++){
-                                rooms[a+1].tiles.push(new tile("assets/stone_wall.png",c,0,rooms[a+1],'wall'));
-                                rooms[a+1].tiles.push(new tile("assets/stone_wall.png",c,9,rooms[a+1],'wall'));       
-                                if(c==5){
-                                    rooms[a+1].tiles.push(new tile("assets/door.png",9,c,rooms[a+1],'door'));
-                                    rooms[a+1].tiles.push(new tile("assets/stone_floor.png",0,c,rooms[a+1],'floor')); 
-                                }else{
-                                    rooms[a+1].tiles.push(new tile("assets/stone_wall.png",9,c,rooms[a+1],'wall'));
-                                    rooms[a+1].tiles.push(new tile("assets/stone_wall.png",0,c,rooms[a+1],'wall')); 
+                            if(rooms[a].tiles[b].relativeX == 9){
+                                rand = round(random(1,2));
+                                if(rand == 1){
+                                    rooms[a].tiles[b].sprite.img.width = 0;
+                                    rooms[a].tiles.splice(b,1);
+                                    rooms.push(new room(rooms[a].pos.x+9,rooms[a].pos.y));
+                                    for(var c=0;c<10;c++){
+                                        rooms[a+1].tiles.push(new tile("assets/stone_wall.png",c,0,rooms[a+1],'wall'));
+                                        rooms[a+1].tiles.push(new tile("assets/stone_wall.png",c,9,rooms[a+1],'wall'));       
+                                        if(c==5){
+                                            rooms[a+1].tiles.push(new tile("assets/door.png",9,c,rooms[a+1],'door'));
+                                            rooms[a+1].tiles.push(new tile("assets/stone_floor.png",0,c,rooms[a+1],'floor')); 
+                                        }else{
+                                            rooms[a+1].tiles.push(new tile("assets/stone_wall.png",9,c,rooms[a+1],'wall'));
+                                            rooms[a+1].tiles.push(new tile("assets/stone_wall.png",0,c,rooms[a+1],'wall')); 
+                                        }
+                                        
+                                    }
+                                    for(var c=0;c<8;c++){
+                                        for(var d=0;d<8;d++){
+                                            rooms[a+1].tiles.push(new tile("assets/stone_floor.png",1+c,1+d,rooms[a+1],'floor'));    
+                                        }  
+                                    }    
+                                }else if(rand == 2){
+                                    rooms[a].tiles[b].sprite.img.width = 0;
+                                    rooms[a].tiles.splice(b,1);
+                                    rooms.push(new room(rooms[a].pos.x+9,rooms[a].pos.y));
+                                    for(var c=0;c<10;c++){
+                                        rooms[a+1].tiles.push(new tile("assets/stone_wall.png",c,0,rooms[a+1],'wall'));
+                                        rooms[a+1].tiles.push(new tile("assets/stone_wall.png",c,9,rooms[a+1],'wall'));       
+                                        if(c==5){
+                                            rooms[a+1].tiles.push(new tile("assets/door.png",9,c,rooms[a+1],'door'));
+                                            rooms[a+1].tiles.push(new tile("assets/stone_floor.png",0,c,rooms[a+1],'floor')); 
+                                        }else{
+                                            rooms[a+1].tiles.push(new tile("assets/stone_wall.png",9,c,rooms[a+1],'wall'));
+                                            rooms[a+1].tiles.push(new tile("assets/stone_wall.png",0,c,rooms[a+1],'wall')); 
+                                        }
+                                        
+                                    }
+                                    for(var c=0;c<8;c++){
+                                        for(var d=0;d<8;d++){
+                                            if((1+c == 1 && 1+d == 3)||(1+c == 3 && 1+d == 3)||(1+c == 3 && 1+d == 2)||(1+c == 3 && 1+d == 1)||(1+c == 4 && 1+d == 3)||(1+c == 6 && 1+d == 3)||(1+c == 6 && 1+d == 2)||(1+c == 6 && 1+d == 1)||(1+c == 7 && 1+d == 3)||(1+c == 1 && 1+d == 6)||(1+c == 3 && 1+d == 6)||(1+c == 3 && 1+d == 7)||(1+c == 3 && 1+d == 8)||(1+c == 4 && 1+d == 6)||(1+c == 6 && 1+d == 6)||(1+c == 6 && 1+d == 7)||(1+c == 6 && 1+d == 8)||(1+c == 7 && 1+d == 6)){
+                                                rooms[a+1].tiles.push(new tile("assets/stone_wall.png",1+c,1+d,rooms[a+1],'wall'));
+                                            }else if((1+c == 2 && 1+d == 3)||(1+c == 5 && 1+d == 3)||(1+c == 8 && 1+d == 3)||(1+c == 2 && 1+d == 6)||(1+c == 5 && 1+d == 6)||(1+c == 8 && 1+d == 6)){
+                                                rooms[a+1].tiles.push(new tile("assets/door.png",1+c,1+d,rooms[a+1],'door'));
+                                            }else{
+                                                rooms[a+1].tiles.push(new tile("assets/stone_floor.png",1+c,1+d,rooms[a+1],'floor'));        
+                                            }
+                                            
+                                        }  
+                                    } 
                                 }
-                                
+                            }else{
+                                rooms[a].tiles[b].sprite.img.realSrc = 'assets/stone_floor.png';
+                                rooms[a].tiles[b].t = "floor";
                             }
-                            for(var c=0;c<8;c++){
-                                for(var d=0;d<8;d++){
-                                    rooms[a+1].tiles.push(new tile("assets/stone_floor.png",1+c,1+d,rooms[a+1],'floor'));    
-                                }  
-                            }
+                            
+                            
                         }
                     } 
                 } 
