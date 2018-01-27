@@ -7,6 +7,7 @@ function img(s,x,y,w,h,n,z){
     this.img.width = 100*w;
     this.img.height = 100*h;
     this.img.draggable = false;
+    this.green = false;
     document.body.appendChild(this.img);
 
     this.pos = document.createElement('style');
@@ -17,7 +18,12 @@ function img(s,x,y,w,h,n,z){
     this.img.className = "cssClass" + n;
 
     this.render = function(){
-        this.pos.innerHTML = '.cssClass' + n + '{  position: fixed; left: ' + this.x*100 +';' + "top: " + this.y*100 + ';' + 'z-index: '+ z +'}';
+        if(this.green == true){  
+            this.img.src = "assets/stone_floor_green.png";
+        }else{
+            this.img.src = s;     
+        }
+        this.pos.innerHTML = '.cssClass' + n + '{  position: fixed; left: ' + this.x*100 +';' + "top: " + this.y*100 + ';' + 'z-index: '+ z +'}'; 
         document.getElementsByTagName('head')[0].appendChild(this.pos);
     }
 }

@@ -15,29 +15,33 @@ var energyText;
 var healthBackground;
 var healthBar;
 var healthText;
+var background;
+var moveSelected = false;
 
 function setup() {
     var room1 = new room(0,0)
     rooms.push(room1);
     for(var a=0;a<10;a++){
-        room1.tiles.push(new tile("assets/stone_wall.png",a,0,room1));
-        room1.tiles.push(new tile("assets/stone_wall.png",a,9,room1));       
-        room1.tiles.push(new tile("assets/stone_wall.png",0,a,room1)); 
+        room1.tiles.push(new tile("assets/stone_wall.png",a,0,room1,'wall'));
+        room1.tiles.push(new tile("assets/stone_wall.png",a,9,room1,'wall'));       
+        room1.tiles.push(new tile("assets/stone_wall.png",0,a,room1,'wall')); 
         if(a==5){
-            room1.tiles.push(new tile("assets/door.png",9,a,room1));
+            room1.tiles.push(new tile("assets/door.png",9,a,room1,'door'));
         }else{
-            room1.tiles.push(new tile("assets/stone_wall.png",9,a,room1));
+            room1.tiles.push(new tile("assets/stone_wall.png",9,a,room1,'wall'));
         }
         
     }
     for(var a=0;a<8;a++){
         for(var b=0;b<8;b++){
-            room1.tiles.push(new tile("assets/stone_floor.png",1+a,1+b,room1));    
+            room1.tiles.push(new tile("assets/stone_floor.png",1+a,1+b,room1,'floor'));    
         }  
     }
 
     player = new player();
         
+    background = new img("assets/background.png",0,0,windowWidth,windowHeight,images.length,-1);
+    images.push(background);
     moveButton = new img("assets/move_button.png",1,10,1.75,0.75,images.length,1);
     images.push(moveButton);
     attackButton = new img("assets/attack_button.png",1,11,1.75,0.75,images.length,1);
@@ -83,10 +87,31 @@ function mouseClicked(){
                 if(done==false){
                     var distance = round(abs(rooms[a].tiles[b].pos.x - player.pos.x)+abs(rooms[a].tiles[b].pos.y - player.pos.y));
                     console.log(distance);
-                    if(distance<=5 && energy>0){
+                    if(distance<=5 && energy>=distance*2 && moveSelected == true && rooms[a].tiles[b].t != 'wall'){
                         player.pos = rooms[a].tiles[b].pos;  
                         done = true;     
                         energy = energy - distance*2; 
+                        if(rooms[a].tiles[b].t == 'door'){
+                            rooms[a].tiles.splice(b,1);
+                            rooms.push(new room(rooms[a].pos.x+9,rooms[a].pos.y));
+                            for(var c=0;c<10;c++){
+                                rooms[a+1].tiles.push(new tile("assets/stone_wall.png",c,0,rooms[a+1],'wall'));
+                                rooms[a+1].tiles.push(new tile("assets/stone_wall.png",c,9,rooms[a+1],'wall'));       
+                                if(c==5){
+                                    rooms[a+1].tiles.push(new tile("assets/door.png",9,c,rooms[a+1],'door'));
+                                    rooms[a+1].tiles.push(new tile("assets/stone_floor.png",0,c,rooms[a+1],'floor')); 
+                                }else{
+                                    rooms[a+1].tiles.push(new tile("assets/stone_wall.png",9,c,rooms[a+1],'wall'));
+                                    rooms[a+1].tiles.push(new tile("assets/stone_wall.png",0,c,rooms[a+1],'wall')); 
+                                }
+                                
+                            }
+                            for(var c=0;c<8;c++){
+                                for(var d=0;d<8;d++){
+                                    rooms[a+1].tiles.push(new tile("assets/stone_floor.png",1+c,1+d,rooms[a+1],'floor'));    
+                                }  
+                            }
+                        }
                     } 
                 } 
             }    
@@ -95,6 +120,10 @@ function mouseClicked(){
     console.log(endTurnButton.x*100,endTurnButton.y*100,endTurnButton.x*100+175,endTurnButton.y*100+75,mouseX,mouseY);
     if(mouseIsContainedInGui(endTurnButton.x*100,endTurnButton.y*100,endTurnButton.x*100+175,endTurnButton.y*100+75)){
         energy = 10;
+        moveSelected = false;
+    }
+    if(mouseIsContainedInGui(moveButton.x*100,moveButton.y*100,moveButton.x*100+175,moveButton.y*100+75)){
+        moveSelected = true;
     }
 }
 
