@@ -96,7 +96,7 @@ function mouseClicked(){
                         energy = energy - distance*2; 
                         if(rooms[a].tiles[b].t == 'door'){
                             if(rooms[a].tiles[b].relativeX == 9 && roomIsPresentAt(rooms[a].pos.x+9,rooms[a].pos.y) == false ){//Right
-                                rand = round(random(1,3));//1,3
+                                rand = round(random(1,5));//1,5
                                 if(rand == 1){
                                     rooms[a].tiles[b].sprite.img.width = 0;
                                     rooms[a].tiles.splice(b,1);
@@ -177,9 +177,59 @@ function mouseClicked(){
                                             
                                         }  
                                     } 
+                                }else if(rand == 4){
+                                    rooms[a].tiles[b].sprite.img.width = 0;
+                                    rooms[a].tiles.splice(b,1);
+                                    var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
+                                    rooms.push(newRoom);
+                                    console.log(rooms[a].pos,newRoom.pos);
+                                    for(var c=0;c<10;c++){
+                                        for(var d=0;d<10;d++){
+                                            if((c==1&&d==3)||(c==2&&d==3)||(c==3&&d==3)||(c==4&&d==3)||(c==5&&d==3)||(c==6&&d==3)||(c==1&&d==6)||(c==2&&d==6)||(c==3&&d==6)||(c==6&&d==3)||(c==6&&d==4)||(c==6&&d==5)||(c==6&&d==6)||(c==6&&d==7)||(c==6&&d==8)||(c==6&&d==9)||(c==3&&d==7)||(c==3&&d==8)||(c==3&&d==9)||(c==4&&d==9)){
+                                                newRoom.tiles.push(new tile("assets/stone_wall.png",c,d,newRoom,'wall'));
+                                            }else if(c==0&&d==5){
+                                                newRoom.tiles.push(new tile("assets/stone_floor.png",c,d,newRoom,'floor'));
+                                            }else if(c==5&&d==9){
+                                                newRoom.tiles.push(new tile("assets/door.png",c,d,newRoom,'door'));
+                                            }
+                                             
+                                            
+                                        }  
+                                    } 
+                                    for(var a=0;a<5;a++){
+                                        for(var b=0;b<2;b++){
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",a+1,b+4,newRoom,'floor'));
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",b+4,a+4,newRoom,'floor'));
+                                        }
+                                    }
+                                }else if(rand == 5){
+                                    rooms[a].tiles[b].sprite.img.width = 0;
+                                    rooms[a].tiles.splice(b,1);
+                                    var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
+                                    rooms.push(newRoom);
+                                    console.log(rooms[a].pos,newRoom.pos);
+                                    for(var c=0;c<10;c++){
+                                        for(var d=0;d<10;d++){
+                                            if((c==1&&d==3)||(c==2&&d==3)||(c==3&&d==3)||(c==6&&d==3)||(c==1&&d==6)||(c==2&&d==6)||(c==3&&d==6)||(c==4&&d==6)||(c==5&&d==6)||(c==6&&d==6)||(c==6&&d==4)||(c==6&&d==3)||(c==6&&d==2)||(c==6&&d==1)||(c==6&&d==0)||(c==3&&d==3)||(c==3&&d==2)||(c==6&&d==5)||(c==3&&d==1)||(c==3&&d==0)||(c==4&&d==0)){
+                                                newRoom.tiles.push(new tile("assets/stone_wall.png",c,d,newRoom,'wall'));
+                                            }else if(c==0&&d==5){
+                                                newRoom.tiles.push(new tile("assets/stone_floor.png",c,d,newRoom,'floor'));
+                                            }else if(c==5&&d==0){
+                                                newRoom.tiles.push(new tile("assets/door.png",c,d,newRoom,'door'));
+                                            }
+                                             
+                                            
+                                        }  
+                                    } 
+                                    for(var a=0;a<5;a++){
+                                        for(var b=0;b<2;b++){
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",a+1,b+4,newRoom,'floor'));
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",b+4,a+1,newRoom,'floor'));
+                                        }
+                                    }
                                 }
                             }else if(rooms[a].tiles[b].relativeY == 9 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y+9) == false ){ //Down
-                                rand = round(random(1,3));//1,3
+                                rand = round(random(1,5));//1,5
                                 if(rand == 1){
                                     console.log("down");
                                     rooms[a].tiles[b].sprite.img.width = 0;
@@ -260,6 +310,56 @@ function mouseClicked(){
                                             
                                         }  
                                     } 
+                                }else if(rand == 4){
+                                    rooms[a].tiles[b].sprite.img.width = 0;
+                                    rooms[a].tiles.splice(b,1);
+                                    var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
+                                    rooms.push(newRoom);
+                                    console.log(rooms[a].pos,newRoom.pos);
+                                    for(var c=0;c<10;c++){
+                                        for(var d=0;d<10;d++){
+                                            if((c==3&&d==1)||(c==3&&d==2)||(c==3&&d==3)||(c==4&&d==3)||(c==5&&d==3)||(c==6&&d==3)||(c==3&&d==6)||(c==6&&d==3)||(c==6&&d==6)||(c==6&&d==1)||(c==6&&d==2)||(c==3&&d==4)||(c==3&&d==5)||(c==4&&d==6)||(c==5&&d==6)||(c==7&&d==3)||(c==8&&d==3)||(c==9&&d==3)||(c==9&&d==4)||(c==9&&d==6)||(c==8&&d==6)||(c==7&&d==6)){
+                                                newRoom.tiles.push(new tile("assets/stone_wall.png",c,d,newRoom,'wall'));
+                                            }else if(c==5&&d==0){
+                                                newRoom.tiles.push(new tile("assets/stone_floor.png",c,d,newRoom,'floor'));
+                                            }else if(c==9&&d==5){
+                                                newRoom.tiles.push(new tile("assets/door.png",c,d,newRoom,'door'));
+                                            }
+                                             
+                                            
+                                        }  
+                                    } 
+                                    for(var a=0;a<5;a++){
+                                        for(var b=0;b<2;b++){
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",b+4,a+1,newRoom,'floor'));
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",a+4,b+4,newRoom,'floor'));
+                                        }
+                                    }
+                                }else if(rand == 5){
+                                    rooms[a].tiles[b].sprite.img.width = 0;
+                                    rooms[a].tiles.splice(b,1);
+                                    var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
+                                    rooms.push(newRoom);
+                                    console.log(rooms[a].pos,newRoom.pos);
+                                    for(var c=0;c<10;c++){
+                                        for(var d=0;d<10;d++){
+                                            if((c==1&&d==3)||(c==2&&d==3)||(c==3&&d==3)||(c==6&&d==3)||(c==1&&d==6)||(c==2&&d==6)||(c==3&&d==6)||(c==4&&d==6)||(c==5&&d==6)||(c==6&&d==6)||(c==6&&d==4)||(c==6&&d==3)||(c==6&&d==2)||(c==6&&d==1)||(c==6&&d==0)||(c==3&&d==3)||(c==3&&d==2)||(c==6&&d==5)||(c==3&&d==1)||(c==3&&d==0)||(c==4&&d==0)||(c==0&&d==4)||(c==0&&d==3)||(c==0&&d==6)){
+                                                newRoom.tiles.push(new tile("assets/stone_wall.png",c,d,newRoom,'wall'));
+                                            }else if(c==0&&d==5){
+                                                newRoom.tiles.push(new tile("assets/door.png",c,d,newRoom,'door'));
+                                            }else if(c==5&&d==0){
+                                                newRoom.tiles.push(new tile("assets/stone_floor.png",c,d,newRoom,'floor'));
+                                            }
+                                             
+                                            
+                                        }  
+                                    } 
+                                    for(var a=0;a<5;a++){
+                                        for(var b=0;b<2;b++){
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",a+1,b+4,newRoom,'floor'));
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",b+4,a+1,newRoom,'floor'));
+                                        }
+                                    }
                                 }
                             }else if(rooms[a].tiles[b].relativeX == 0 && roomIsPresentAt(rooms[a].pos.x-9,rooms[a].pos.y) == false ){//Left
                                 rand = round(random(1,3));//1,3
@@ -340,6 +440,89 @@ function mouseClicked(){
                                     for(var c=0;c<8;c++){
                                         for(var d=0;d<2;d++){
                                             newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,4+d,newRoom,'floor')); 
+                                            
+                                        }  
+                                    } 
+                                }
+                            }else if(rooms[a].tiles[b].relativeY == 0 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y-9) == false ){ //Up
+                                rand = round(random(1,3));//1,3
+                                if(rand == 1){
+                                    console.log("down");
+                                    rooms[a].tiles[b].sprite.img.width = 0;
+                                    rooms[a].tiles.splice(b,1);
+                                    var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
+                                    rooms.push(newRoom);
+                                    for(var c=0;c<10;c++){    
+                                        if(c==5){
+                                            newRoom.tiles.push(new tile("assets/door.png",9,c,newRoom,'door'));
+                                            newRoom.tiles.push(new tile("assets/door.png",0,c,newRoom,'door')); 
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",c,9,newRoom,'floor')); 
+                                            newRoom.tiles.push(new tile("assets/door.png",c,0,newRoom,'door'));   
+                                        }else{
+                                            rooms[a+1].tiles.push(new tile("assets/stone_wall.png",9,c,newRoom,'wall'));
+                                            rooms[a+1].tiles.push(new tile("assets/stone_wall.png",0,c,newRoom,'wall')); 
+                                            rooms[a+1].tiles.push(new tile("assets/stone_wall.png",c,9,newRoom,'wall'));  
+                                            rooms[a+1].tiles.push(new tile("assets/stone_wall.png",c,0,newRoom,'wall')); 
+                                        }
+                                        
+                                    }
+                                    for(var c=0;c<8;c++){
+                                        for(var d=0;d<8;d++){
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,1+d,newRoom,'floor'));    
+                                        }  
+                                    }    
+                                }else if(rand == 2){
+                                    rooms[a].tiles[b].sprite.img.width = 0;
+                                    rooms[a].tiles.splice(b,1);
+                                    var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
+                                    rooms.push(newRoom);
+                                    for(var c=0;c<10;c++){  
+                                        newRoom.tiles.push(new tile("assets/stone_wall.png",0,c,newRoom,'wall'));  
+                                        newRoom.tiles.push(new tile("assets/stone_wall.png",9,c,newRoom,'wall'));  
+                                        if(c==5){
+                                            newRoom.tiles.push(new tile("assets/door.png",c,0,newRoom,'door'));  
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",c,9,newRoom,'floor'))
+                                        }else{
+                                            newRoom.tiles.push(new tile("assets/stone_wall.png",c,0,newRoom,'wall'))
+                                            newRoom.tiles.push(new tile("assets/stone_wall.png",c,9,newRoom,'wall'));  
+                                        }
+                                        
+                                    }
+                                    for(var c=0;c<8;c++){
+                                        for(var d=0;d<8;d++){
+                                            if((1+c == 3 && 1+d == 1)||(1+c == 6 && 1+d == 1)||(1+c == 3 && 1+d == 3)||(1+c == 2 && 1+d == 3)||(1+c == 1 && 1+d == 3)||(1+c == 6 && 1+d == 3)||(1+c == 7 && 1+d == 3)||(1+c == 8 && 1+d == 3)||(1+c == 3 && 1+d == 4)||(1+c == 6 && 1+d == 4)||(1+c == 3 && 1+d == 6)||(1+c == 2 && 1+d == 6)||(1+c == 1 && 1+d == 6)||(1+c == 6 && 1+d == 6)||(1+c == 7 && 1+d == 6)||(1+c == 8 && 1+d == 6)||(1+c == 3 && 1+d == 7)||(1+c == 6 && 1+d == 7)){
+                                                newRoom.tiles.push(new tile("assets/stone_wall.png",1+c,1+d,newRoom,'wall'));
+                                            }else if((1+c == 3 && 1+d == 2)||(1+c == 6 && 1+d == 2)||(1+c == 3 && 1+d == 5)||(1+c == 6 && 1+d == 5)||(1+c == 3 && 1+d == 8)||(1+c == 6 && 1+d == 8)){
+                                                newRoom.tiles.push(new tile("assets/door.png",1+c,1+d,newRoom,'door'));
+                                            }else{
+                                                newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,1+d,newRoom,'floor'));        
+                                            }
+                                            
+                                        }  
+                                    } 
+                                }else if(rand == 3){
+                                    rooms[a].tiles[b].sprite.img.width = 0;
+                                    rooms[a].tiles.splice(b,1);
+                                    var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
+                                    rooms.push(newRoom);
+                                    console.log(rooms[a].pos,newRoom.pos);
+                                    for(var c=0;c<10;c++){    
+                                        newRoom.tiles.push(new tile("assets/stone_wall.png",3,c,newRoom,'wall'));
+                                        newRoom.tiles.push(new tile("assets/stone_wall.png",6,c,newRoom,'wall'));   
+                                        if(c==3||c==4||c==6){
+                                            newRoom.tiles.push(new tile("assets/stone_wall.png",c,0,newRoom,'wall'));
+                                            newRoom.tiles.push(new tile("assets/stone_wall.png",c,9,newRoom,'wall')); 
+                                        }else if(c==5){
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",c,9,newRoom,'floor'));
+                                            newRoom.tiles.push(new tile("assets/door.png",c,0,newRoom,'door')); 
+                                        }else{
+                                        
+                                        }
+                                        
+                                    }
+                                    for(var c=0;c<2;c++){
+                                        for(var d=0;d<8;d++){
+                                            newRoom.tiles.push(new tile("assets/stone_floor.png",4+c,1+d,newRoom,'floor')); 
                                             
                                         }  
                                     } 
