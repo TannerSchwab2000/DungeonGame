@@ -1,10 +1,11 @@
 var images = [];
 var rooms = [];
+var creatures = [];
 var player;
 var lastTick = Date.now();
 var updateRate = 0.05;
 var move = false;
-var health = 0;
+var health = 10;
 var energy = 10;
 var moveButton;
 var attackButton;
@@ -16,7 +17,9 @@ var healthBackground;
 var healthBar;
 var healthText;
 var background;
+var deathBackground;
 var moveSelected = false;
+var attackSelected = false;
 
 function setup() {
     console.log(windowWidth,windowHeight);
@@ -40,6 +43,8 @@ function setup() {
     }
 
     player = new player();
+    goblin = new creature("assets/goblin.png",8,2,3,3);
+    creatures.push(goblin);
         
     background = new img("assets/background.png",0,0,windowWidth,windowHeight,images.length,-1);
     images.push(background);
@@ -61,25 +66,36 @@ function setup() {
     images.push(healthBar);
     healthText = new img("assets/health_text.png",3,round((windowHeight-300)/100),1.75,0.75,images.length,1);
     images.push(healthText);
+    deathBackground = new img("assets/death_background.png",0,0,windowWidth/100,windowHeight/100,images.length,2);
+    deathBackground.img.style.visibility = "hidden";
+    images.push(deathBackground);
 }
 
 function draw() {
-    healthBar.img.width = 17.5*health;
-    energyBar.img.width = 17.5*energy;
-    player.render();
-    if(Date.now()-lastTick>updateRate*1000){
-        lastTick = Date.now();
-        for(var a=0;a<rooms.length;a++){
-            for(var b=0;b<rooms[a].tiles.length;b++){
-                var distance = abs(rooms[a].tiles[b].pos.x - player.pos.x)+abs(rooms[a].tiles[b].pos.y - player.pos.y);
-                if(distance<25){
-                    rooms[a].tiles[b].render()
+    if(health>0){
+        healthBar.img.width = 17.5*health;
+        energyBar.img.width = 17.5*energy;
+        player.render();
+        if(Date.now()-lastTick>updateRate*1000){
+            lastTick = Date.now();
+            for(var a=0;a<rooms.length;a++){
+                for(var b=0;b<rooms[a].tiles.length;b++){
+                    var distance = abs(rooms[a].tiles[b].pos.x - player.pos.x)+abs(rooms[a].tiles[b].pos.y - player.pos.y);
+                    if(distance<25){
+                        rooms[a].tiles[b].render()
+                    }
+                    
                 }
-                
+            }    
+            for(var a=0;a<creatures.length;a++){
+                    creatures[a].render();
             }
         }    
-
+    }else{
+        deathBackground.img.style.visibility = "visible";
+        deathBackground.render();
     }
+    
     
 }
 
@@ -615,9 +631,7 @@ function mouseClicked(){
                                                 newRoom.tiles.push(new tile("assets/door.png",c,d,newRoom,'door'));
                                             }else if(c==5&&d==9){
                                                 newRoom.tiles.push(new tile("assets/stone_floor.png",c,d,newRoom,'floor'));
-                                            }
-                                             
-                                            
+                                            }  
                                         }  
                                     } 
                                     for(var a=0;a<5;a++){
@@ -630,11 +644,17 @@ function mouseClicked(){
                             }else{
                                 rooms[a].tiles[b].sprite.img.realSrc = 'assets/stone_floor.png';
                                 rooms[a].tiles[b].t = "floor";
-                            }
-                            
-                            
+                            }   
                         }
-                    } 
+                    }
+                    if(distance<=1&&energy>4&&attackSelected==true){
+                        for(var c=0;c<creatures.length;c++){
+                            if(creatures[c].pos.x == rooms[a].tiles[b].pos.x && creatures[c].pos.y == rooms[a].tiles[b].pos.y){
+                                energy-=5;
+                                creatures[c].health--;
+                            }
+                        }
+                    }
                 } 
             }    
         }
@@ -642,9 +662,17 @@ function mouseClicked(){
     if(mouseIsContainedInGui(endTurnButton.x*100,endTurnButton.y*100,endTurnButton.x*100+175,endTurnButton.y*100+75)){
         energy = 10;
         moveSelected = false;
+        attackSelected = false;
+        for(var a=0;a<creatures.length;a++){
+            creatures[a].energy = creatures[a].maxEnergy;
+        }
     }
     if(mouseIsContainedInGui(moveButton.x*100,moveButton.y*100,moveButton.x*100+175,moveButton.y*100+75)){
         moveSelected = true;
+    }
+    if(mouseIsContainedInGui(attackButton.x*100,attackButton.y*100,attackButton.x*100+175,attackButton.y*100+75)){
+        moveSelected = false;
+        attackSelected = true;
     }
 }
 
@@ -668,6 +696,17 @@ function roomIsPresentAt(x,y){
     for(var a=0;a<rooms.length;a++){
         if(rooms[a].pos.x == x && rooms[a].pos.y == y){
             return true;
+        }
+    }
+    return false;
+}
+
+function wallIsPresentAt(x,y){
+    for(var a=0;a<rooms.length;a++){
+        for(var b=0;b<rooms[a].tiles.length;b++){
+            if(rooms[a].tiles[b].pos.x == x && rooms[a].tiles[b].pos.y == y && rooms[a].tiles[b].t == "wall"){
+                return true;
+            }
         }
     }
     return false;

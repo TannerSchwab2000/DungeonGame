@@ -9,6 +9,7 @@ function img(s,x,y,w,h,n,z){
     this.img.height = 100*h;
     this.img.draggable = false;
     this.green = false;
+    this.red = false;
     document.body.appendChild(this.img);
 
     this.pos = document.createElement('style');
@@ -21,6 +22,8 @@ function img(s,x,y,w,h,n,z){
     this.render = function(){
         if(this.green == true){  
             this.img.src = "assets/stone_floor_green.png";
+        }else if(this.red == true){  
+            this.img.src = "assets/stone_floor_red.png";
         }else{
             this.img.src = this.img.realSrc;     
         }
