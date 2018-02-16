@@ -25,17 +25,38 @@ function creature(s,x,y,h,e){
                 health--;
                 console.log(health);
             }else{
-                if(this.pathClear){
+                    var up = false;
+                    var down = false;
+                    var left = false;
+                    var right = false;
                     if(player.pos.y>this.pos.y){
-                        this.pos.y++;
-                    }else if(player.pos.y<this.pos.y){
-                        this.pos.y--;
-                    }else if(player.pos.x>this.pos.x){
-                        this.pos.x++;
-                    }else if(player.pos.x<this.pos.x){
-                        this.pos.x--;
+                        down = true;
+                    }if(player.pos.y<this.pos.y){
+                        up = true;
+                    }if(player.pos.x>this.pos.x){
+                        right = true;
+                    }if(player.pos.x<this.pos.x){
+                        left = true;
                     }    
-                }
+
+                    var done = false;
+                    if(up==true && done==false && wallIsPresentAt(this.pos.x,this.pos.y-1)==false){
+                        this.pos.y--;
+                        done = true;
+                    }
+                    if(right==true && done==false && wallIsPresentAt(this.pos.x+1,this.pos.y)==false){
+                        this.pos.x++;
+                        done = true;
+                    }
+                    if(down==true && done==false && wallIsPresentAt(this.pos.x,this.pos.y+1)==false){
+                        this.pos.y++;
+                        done = true;
+                    }
+                    if(left==true && done==false && wallIsPresentAt(this.pos.x-1,this.pos.y)==false){
+                        this.pos.x--;
+                        done = true;
+                    }
+
                 
             }
 	        	
