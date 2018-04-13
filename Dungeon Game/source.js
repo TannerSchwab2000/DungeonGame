@@ -1,6 +1,11 @@
 var images = [];
 var rooms = [];
 var creatures = [];
+var mapItems = [];
+var inventory = [];
+var clickOptions = [];
+var clickPos;
+var clickOption1;
 var player;
 var lastTick = Date.now();
 var updateRate = 0.05;
@@ -10,16 +15,20 @@ var energy = 10;
 var moveButton;
 var attackButton;
 var endTurnButton;
+var pickUpButton;
 var energyBackground;
 var energyBar;
 var energyText;
 var healthBackground;
 var healthBar;
 var healthText;
+var inventoryBackground;
 var background;
 var deathBackground;
 var moveSelected = false;
 var attackSelected = false;
+var controlHeld = false;
+var clickOptionsVisible = false;
 
 function setup() {
     console.log(windowWidth,windowHeight);
@@ -64,11 +73,16 @@ function setup() {
     images.push(healthBackground);
     healthBar = new img("assets/health.png",3,round((windowHeight-300)/100),1.75,0.75,images.length,1);
     images.push(healthBar);
+    inventoryBackground = new img("assets/inventory_background.png",5,round((windowHeight-300)/100),3,3,images.length,1);
+    images.push(inventoryBackground);
     healthText = new img("assets/health_text.png",3,round((windowHeight-300)/100),1.75,0.75,images.length,1);
     images.push(healthText);
-    deathBackground = new img("assets/death_background.png",0,0,windowWidth/100,windowHeight/100,images.length,2);
+    deathBackground = new img("assets/death_background.png",0,0,windowWidth/100,windowHeight/100,images.length,5);
     deathBackground.img.style.visibility = "hidden";
     images.push(deathBackground);
+    pickUpButton = new img("assets/pick_up_button.png",-1,0,1,0.3,images.length,3);
+
+
 }
 
 function draw() {
@@ -90,17 +104,45 @@ function draw() {
             for(var a=0;a<creatures.length;a++){
                     creatures[a].render();
             }
+            for(var a=0;a<mapItems.length;a++){
+                mapItems[a].render();
+            }
         }    
     }else{
         deathBackground.img.style.visibility = "visible";
         deathBackground.render();
+    }
+    if(clickOptionsVisible==true){
+        for(var a=0;a<clickOptions.length;a++){
+            if(clickOptions[a].type == "pickUp"){
+                pickUpButton.img.style.visibility = "visible";
+                pickUpButton.x = clickPos.x;
+                pickUpButton.y = clickPos.y;
+                pickUpButton.render();
+            }
+        }
+    }else{
+        pickUpButton.x = -99999;
+        pickUpButton.img.style.visibility = "hidden";
     }
     
     
 }
 
 function mouseClicked(){
+    clickOptionsVisible = false;
     var done = false;
+
+    for(var a=0;a<mapItems.length;a++){
+        if(mouseIsContainedIn(mapItems[a].x*100,mapItems[a].y*100,mapItems[a].x*100+100,mapItems[a].y*100+100)){
+            if(controlHeld == true){
+                clickOptions.push(new clickOption("pickUp"));
+                clickOptionsVisible = true;
+                clickPos = createVector(mapItems[a].x - player.pos.x+11,mapItems[a].y - player.pos.y+5); 
+                mapItems[a].sprite.render(); 
+            } 
+        }
+    }
     for(var a=0;a<rooms.length;a++){
         for(var b=0;b<rooms[a].tiles.length;b++){
             if(mouseIsContainedIn(rooms[a].tiles[b].pos.x*100,rooms[a].tiles[b].pos.y*100,rooms[a].tiles[b].pos.x*100+100,rooms[a].tiles[b].pos.y*100+100)){
@@ -118,7 +160,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",c,0,newRoom,'wall'));    
                                         if(c==5){
@@ -142,7 +183,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",c,0,newRoom,'wall'));
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",c,9,newRoom,'wall'));       
@@ -172,7 +212,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){    
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",c,3,newRoom,'wall'));
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",c,6,newRoom,'wall'));   
@@ -198,7 +237,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         for(var d=0;d<10;d++){
                                             if((c==1&&d==3)||(c==2&&d==3)||(c==3&&d==3)||(c==4&&d==3)||(c==5&&d==3)||(c==6&&d==3)||(c==1&&d==6)||(c==2&&d==6)||(c==3&&d==6)||(c==6&&d==3)||(c==6&&d==4)||(c==6&&d==5)||(c==6&&d==6)||(c==6&&d==7)||(c==6&&d==8)||(c==6&&d==9)||(c==3&&d==7)||(c==3&&d==8)||(c==3&&d==9)||(c==4&&d==9)){
@@ -223,7 +261,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         for(var d=0;d<10;d++){
                                             if((c==1&&d==3)||(c==2&&d==3)||(c==3&&d==3)||(c==6&&d==3)||(c==1&&d==6)||(c==2&&d==6)||(c==3&&d==6)||(c==4&&d==6)||(c==5&&d==6)||(c==6&&d==6)||(c==6&&d==4)||(c==6&&d==3)||(c==6&&d==2)||(c==6&&d==1)||(c==6&&d==0)||(c==3&&d==3)||(c==3&&d==2)||(c==6&&d==5)||(c==3&&d==1)||(c==3&&d==0)||(c==4&&d==0)){
@@ -246,8 +283,7 @@ function mouseClicked(){
                                 }
                             }else if(rooms[a].tiles[b].relativeY == 9 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y+9) == false ){ //Down
                                 rand = round(random(1,5));//1,5
-                                if(rand == 1){
-                                    console.log("down");
+                                if(rand == 1){ //Opening
                                     rooms[a].tiles[b].sprite.img.width = 0;
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
@@ -271,12 +307,12 @@ function mouseClicked(){
                                             newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,1+d,newRoom,'floor'));    
                                         }  
                                     }    
-                                }else if(rand == 2){
+                                }else if(rand == 2){//Bedroom
                                     rooms[a].tiles[b].sprite.img.width = 0;
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
                                     rooms.push(newRoom);
-                                    for(var c=0;c<10;c++){  
+                                    for(var c=0;c<10;c++){ 
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",0,c,newRoom,'wall'));  
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",9,c,newRoom,'wall'));  
                                         if(c==5){
@@ -300,12 +336,11 @@ function mouseClicked(){
                                             
                                         }  
                                     } 
-                                }else if(rand == 3){
+                                }else if(rand == 3){//Hallway
                                     rooms[a].tiles[b].sprite.img.width = 0;
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){    
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",3,c,newRoom,'wall'));
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",6,c,newRoom,'wall'));   
@@ -326,15 +361,14 @@ function mouseClicked(){
                                             
                                         }  
                                     } 
-                                }else if(rand == 4){
+                                }else if(rand == 4){//Left Turn 
                                     rooms[a].tiles[b].sprite.img.width = 0;
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         for(var d=0;d<10;d++){
-                                            if((c==3&&d==1)||(c==3&&d==2)||(c==3&&d==3)||(c==4&&d==3)||(c==5&&d==3)||(c==6&&d==3)||(c==3&&d==6)||(c==6&&d==3)||(c==6&&d==6)||(c==6&&d==1)||(c==6&&d==2)||(c==3&&d==4)||(c==3&&d==5)||(c==4&&d==6)||(c==5&&d==6)||(c==7&&d==3)||(c==8&&d==3)||(c==9&&d==3)||(c==9&&d==4)||(c==9&&d==6)||(c==8&&d==6)||(c==7&&d==6)){
+                                            if((c==3&&d==1)||(c==3&&d==2)||(c==3&&d==3)||(c==6&&d==3)||(c==3&&d==6)||(c==6&&d==3)||(c==6&&d==6)||(c==6&&d==1)||(c==6&&d==2)||(c==3&&d==4)||(c==3&&d==5)||(c==4&&d==6)||(c==5&&d==6)||(c==7&&d==3)||(c==8&&d==3)||(c==9&&d==3)||(c==9&&d==4)||(c==9&&d==6)||(c==8&&d==6)||(c==7&&d==6)){
                                                 newRoom.tiles.push(new tile("assets/stone_wall.png",c,d,newRoom,'wall'));
                                             }else if(c==5&&d==0){
                                                 newRoom.tiles.push(new tile("assets/stone_floor.png",c,d,newRoom,'floor'));
@@ -351,12 +385,11 @@ function mouseClicked(){
                                             newRoom.tiles.push(new tile("assets/stone_floor.png",a+4,b+4,newRoom,'floor'));
                                         }
                                     }
-                                }else if(rand == 5){
+                                }else if(rand == 5){//Right Turn
                                     rooms[a].tiles[b].sprite.img.width = 0;
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         for(var d=0;d<10;d++){
                                             if((c==1&&d==3)||(c==2&&d==3)||(c==3&&d==3)||(c==6&&d==3)||(c==1&&d==6)||(c==2&&d==6)||(c==3&&d==6)||(c==4&&d==6)||(c==5&&d==6)||(c==6&&d==6)||(c==6&&d==4)||(c==6&&d==3)||(c==6&&d==2)||(c==6&&d==1)||(c==6&&d==0)||(c==3&&d==3)||(c==3&&d==2)||(c==6&&d==5)||(c==3&&d==1)||(c==3&&d==0)||(c==4&&d==0)||(c==0&&d==4)||(c==0&&d==3)||(c==0&&d==6)){
@@ -384,7 +417,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",c,0,newRoom,'wall'));    
                                         if(c==5){
@@ -408,7 +440,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",c,0,newRoom,'wall'));
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",c,9,newRoom,'wall'));       
@@ -438,7 +469,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){    
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",c,3,newRoom,'wall'));
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",c,6,newRoom,'wall'));   
@@ -464,7 +494,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         for(var d=0;d<10;d++){
                                             if((c==3&&d==1)||(c==3&&d==2)||(c==3&&d==3)||(c==4&&d==3)||(c==5&&d==3)||(c==6&&d==3)||(c==3&&d==6)||(c==6&&d==3)||(c==6&&d==6)||(c==6&&d==1)||(c==6&&d==2)||(c==3&&d==4)||(c==3&&d==5)||(c==4&&d==6)||(c==5&&d==6)||(c==7&&d==3)||(c==8&&d==3)||(c==9&&d==3)||(c==9&&d==4)||(c==9&&d==6)||(c==8&&d==6)||(c==7&&d==6)||(c==6&&d==0)||(c==4&&d==0)||(c==3&&d==0)){
@@ -489,7 +518,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         for(var d=0;d<10;d++){
                                             if((c==3&&d==3)||(c==4&&d==3)||(c==5&&d==3)||(c==6&&d==3)||(c==3&&d==6)||(c==6&&d==3)||(c==6&&d==6)||(c==3&&d==4)||(c==3&&d==5)||(c==7&&d==3)||(c==8&&d==3)||(c==9&&d==3)||(c==9&&d==4)||(c==9&&d==6)||(c==8&&d==6)||(c==7&&d==6)||(c==3&&d==7)||(c==3&&d==8)||(c==6&&d==7)||(c==6&&d==8)||(c==6&&d==9)||(c==4&&d==9)||(c==3&&d==9)){
@@ -513,7 +541,6 @@ function mouseClicked(){
                             }else if(rooms[a].tiles[b].relativeY == 0 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y-9) == false ){ //Up
                                 rand = round(random(1,5));//1,5
                                 if(rand == 1){
-                                    console.log("down");
                                     rooms[a].tiles[b].sprite.img.width = 0;
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
@@ -571,7 +598,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){    
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",3,c,newRoom,'wall'));
                                         newRoom.tiles.push(new tile("assets/stone_wall.png",6,c,newRoom,'wall'));   
@@ -597,7 +623,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         for(var d=0;d<10;d++){
                                             if((c==1&&d==3)||(c==2&&d==3)||(c==3&&d==3)||(c==4&&d==3)||(c==5&&d==3)||(c==6&&d==3)||(c==1&&d==6)||(c==2&&d==6)||(c==3&&d==6)||(c==6&&d==3)||(c==6&&d==4)||(c==6&&d==5)||(c==6&&d==6)||(c==6&&d==7)||(c==6&&d==8)||(c==6&&d==9)||(c==3&&d==7)||(c==3&&d==8)||(c==3&&d==9)||(c==4&&d==9)||(c==0&&d==6)||(c==0&&d==4)||(c==0&&d==3)){
@@ -622,7 +647,6 @@ function mouseClicked(){
                                     rooms[a].tiles.splice(b,1);
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
                                     rooms.push(newRoom);
-                                    console.log(rooms[a].pos,newRoom.pos);
                                     for(var c=0;c<10;c++){
                                         for(var d=0;d<10;d++){
                                             if((c==3&&d==3)||(c==4&&d==3)||(c==5&&d==3)||(c==6&&d==3)||(c==3&&d==6)||(c==6&&d==3)||(c==6&&d==6)||(c==3&&d==4)||(c==3&&d==5)||(c==7&&d==3)||(c==8&&d==3)||(c==9&&d==3)||(c==9&&d==4)||(c==9&&d==6)||(c==8&&d==6)||(c==7&&d==6)||(c==3&&d==7)||(c==3&&d==8)||(c==6&&d==7)||(c==6&&d==8)||(c==6&&d==9)||(c==4&&d==9)||(c==3&&d==9)){
@@ -676,6 +700,18 @@ function mouseClicked(){
     }
 }
 
+function keyPressed(){
+    if(keyCode == 17){
+        controlHeld = true;
+    }
+}
+
+function keyReleased(){
+    if(keyCode == 17){
+        controlHeld = false;
+    }
+}
+
 function mouseIsContainedIn(x1,y1,x2,y2){
     if(mouseX >= x1-(player.pos.x-11)*100 && mouseX<= x2-(player.pos.x-11)*100 && mouseY >= y1-(player.pos.y-5)*100 && mouseY <= y2-(player.pos.y-5)*100){
         return true;
@@ -710,5 +746,32 @@ function wallIsPresentAt(x,y){
         }
     }
     return false;
+}
+
+function item(type,id){
+    this.type = type;
+    this.id = id;
+}
+
+function mapItem(s,x,y){
+    console.log(s);
+    this.s = s;
+    this.x = x;
+    this.y = y;
+    this.sprite = new img(s,x,y,1,1,images.length,2);
+    images.push(this.sprite);
+    mapItems.push(this);
+    this.render = function(){
+        this.sprite.x = this.x - player.pos.x+11;
+        this.sprite.y = this.y - player.pos.y+5;
+        this.sprite.render();
+    }
+}
+
+function clickOption(type){
+    this.type = type;
+    
+    
+    
 }
 

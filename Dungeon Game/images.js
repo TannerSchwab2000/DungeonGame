@@ -2,6 +2,7 @@
 function img(s,x,y,w,h,n,z){
     this.x = x;
     this.y = y;
+    this.n = n;
     this.img = document.createElement("IMG");
     this.img.realSrc = s;
     this.img.src = s;
@@ -14,7 +15,7 @@ function img(s,x,y,w,h,n,z){
 
     this.pos = document.createElement('style');
     this.pos.type = 'text/css';
-    this.pos.innerHTML = '.cssClass' + n + '{  position: fixed; left: ' + this.x*100 +';' + "top: " + this.y*100 + ';' + 'z-index: '+ z +'}';
+    this.pos.innerHTML = '.cssClass' + n + '{  user-select: none; position: absolute; left: ' + this.x*100 +';' + "top: " + this.y*100 + ';' + 'z-index: '+ z +'}';
     document.getElementsByTagName('head')[0].appendChild(this.pos);
 
     this.img.className = "cssClass" + n;
@@ -27,7 +28,7 @@ function img(s,x,y,w,h,n,z){
         }else{
             this.img.src = this.img.realSrc;     
         }
-        this.pos.innerHTML = '.cssClass' + n + '{  position: fixed; left: ' + this.x*100 +';' + "top: " + this.y*100 + ';' + 'z-index: '+ z +'}'; 
+        this.pos.innerHTML = '.cssClass' + n + '{  user-select: none; position: absolute; left: ' + this.x*100 +';' + "top: " + this.y*100 + ';' + 'z-index: '+ z +'}'; 
         document.getElementsByTagName('head')[0].appendChild(this.pos);
     }
 }
