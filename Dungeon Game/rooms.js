@@ -35,7 +35,6 @@ function tile(s,x,y,parent,t){
             this.sprite.green = false;  
         }
         
-        
         this.sprite.x = this.pos.x - player.pos.x+11;
         this.sprite.y = this.pos.y - player.pos.y+5;
         this.sprite.render();

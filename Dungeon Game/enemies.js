@@ -29,11 +29,9 @@ function creature(s,x,y,h,e){
                 var drop = new mapItem("assets/daggerDrop.png",this.pos.x,this.pos.y);
                 this.itemSprite1.x = -99999;
                 this.itemSprite1.render();
-                images.splice(this.itemSprite1.n,1);
                 this.itemSprite1 = null;
             }
     		this.pos = createVector(-99999,-99999);
-            images.splice(this.sprite.n,1);
             
     	}
         if(this.itemSprite1 != null){

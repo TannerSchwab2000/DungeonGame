@@ -55,7 +55,7 @@ function setup() {
     goblin = new creature("assets/goblin.png",8,2,3,3);
     creatures.push(goblin);
         
-    background = new img("assets/background.png",0,0,windowWidth,windowHeight,images.length,-1);
+    background = new img("assets/background.png",0,0,windowWidth/100,windowHeight/100,images.length,-1);
     images.push(background);
     moveButton = new img("assets/move_button.png",1,round((windowHeight-300)/100),1.75,0.75,images.length,1);
     images.push(moveButton);
@@ -80,7 +80,7 @@ function setup() {
     deathBackground = new img("assets/death_background.png",0,0,windowWidth/100,windowHeight/100,images.length,5);
     deathBackground.img.style.visibility = "hidden";
     images.push(deathBackground);
-    pickUpButton = new img("assets/pick_up_button.png",-1,0,1,0.3,images.length,3);
+    pickUpButton = new img("assets/pick_up_button.png",-1,0,1,0.3,images.length,5);
 
 
 }
@@ -119,10 +119,10 @@ function draw() {
                 pickUpButton.x = clickPos.x;
                 pickUpButton.y = clickPos.y;
                 pickUpButton.render();
+                console.log(pickUpButton);
             }
         }
     }else{
-        pickUpButton.x = -99999;
         pickUpButton.img.style.visibility = "hidden";
     }
     
@@ -131,6 +131,7 @@ function draw() {
 
 function mouseClicked(){
     clickOptionsVisible = false;
+    clickOptions.splice(0,clickOptions.length);
     var done = false;
 
     for(var a=0;a<mapItems.length;a++){
@@ -156,8 +157,8 @@ function mouseClicked(){
                             if(rooms[a].tiles[b].relativeX == 9 && roomIsPresentAt(rooms[a].pos.x+9,rooms[a].pos.y) == false ){//Right
                                 rand = round(random(1,5));//1,5
                                 if(rand == 1){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -179,8 +180,8 @@ function mouseClicked(){
                                         }  
                                     }    
                                 }else if(rand == 2){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -208,8 +209,8 @@ function mouseClicked(){
                                         }  
                                     } 
                                 }else if(rand == 3){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){    
@@ -233,8 +234,8 @@ function mouseClicked(){
                                         }  
                                     } 
                                 }else if(rand == 4){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -257,8 +258,8 @@ function mouseClicked(){
                                         }
                                     }
                                 }else if(rand == 5){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -284,8 +285,8 @@ function mouseClicked(){
                             }else if(rooms[a].tiles[b].relativeY == 9 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y+9) == false ){ //Down
                                 rand = round(random(1,5));//1,5
                                 if(rand == 1){ //Opening
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){    
@@ -308,8 +309,8 @@ function mouseClicked(){
                                         }  
                                     }    
                                 }else if(rand == 2){//Bedroom
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){ 
@@ -337,8 +338,8 @@ function mouseClicked(){
                                         }  
                                     } 
                                 }else if(rand == 3){//Hallway
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){    
@@ -362,8 +363,8 @@ function mouseClicked(){
                                         }  
                                     } 
                                 }else if(rand == 4){//Left Turn 
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -386,8 +387,8 @@ function mouseClicked(){
                                         }
                                     }
                                 }else if(rand == 5){//Right Turn
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y+9);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -413,8 +414,8 @@ function mouseClicked(){
                             }else if(rooms[a].tiles[b].relativeX == 0 && roomIsPresentAt(rooms[a].pos.x-9,rooms[a].pos.y) == false ){//Left
                                 rand = round(random(1,5));//1,5
                                 if(rand == 1){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -436,8 +437,8 @@ function mouseClicked(){
                                         }  
                                     }    
                                 }else if(rand == 2){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -465,8 +466,8 @@ function mouseClicked(){
                                         }  
                                     } 
                                 }else if(rand == 3){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){    
@@ -490,8 +491,8 @@ function mouseClicked(){
                                         }  
                                     } 
                                 }else if(rand == 4){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -514,8 +515,8 @@ function mouseClicked(){
                                         }
                                     }
                                 }else if(rand == 5){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -541,8 +542,8 @@ function mouseClicked(){
                             }else if(rooms[a].tiles[b].relativeY == 0 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y-9) == false ){ //Up
                                 rand = round(random(1,5));//1,5
                                 if(rand == 1){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){    
@@ -565,8 +566,8 @@ function mouseClicked(){
                                         }  
                                     }    
                                 }else if(rand == 2){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){  
@@ -594,8 +595,8 @@ function mouseClicked(){
                                         }  
                                     } 
                                 }else if(rand == 3){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){    
@@ -619,8 +620,8 @@ function mouseClicked(){
                                         }  
                                     } 
                                 }else if(rand == 4){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -643,8 +644,8 @@ function mouseClicked(){
                                         }
                                     }
                                 }else if(rand == 5){
-                                    rooms[a].tiles[b].sprite.img.width = 0;
-                                    rooms[a].tiles.splice(b,1);
+                                    rooms[a].tiles[b].sprite.x = -9999;
+                            
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
                                     rooms.push(newRoom);
                                     for(var c=0;c<10;c++){
@@ -754,7 +755,6 @@ function item(type,id){
 }
 
 function mapItem(s,x,y){
-    console.log(s);
     this.s = s;
     this.x = x;
     this.y = y;
