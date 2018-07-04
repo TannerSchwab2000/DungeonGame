@@ -3,6 +3,7 @@ var rooms = [];
 var creatures = [];
 var mapItems = [];
 var inventory = [];
+var slot1;
 var clickOptions = [];
 var clickPos;
 var clickOption1;
@@ -29,6 +30,7 @@ var moveSelected = false;
 var attackSelected = false;
 var controlHeld = false;
 var clickOptionsVisible = false;
+var selectedItem;
 
 function setup() {
     console.log(windowWidth,windowHeight);
@@ -80,9 +82,10 @@ function setup() {
     deathBackground = new img("assets/death_background.png",0,0,windowWidth/100,windowHeight/100,images.length,5);
     deathBackground.img.style.visibility = "hidden";
     images.push(deathBackground);
-    pickUpButton = new img("assets/pick_up_button.png",-1,0,1,0.3,images.length,5);
-
-
+    pickUpButton = new img("assets/pick_up_button.png",-1,0,1,0.3,images.length,3);
+    images.push(pickUpButton);
+    slot1 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100),1,1,images.length,1);
+    images.push(slot1);
 }
 
 function draw() {
@@ -92,6 +95,13 @@ function draw() {
         player.render();
         if(Date.now()-lastTick>updateRate*1000){
             lastTick = Date.now();
+            for(var a=0;a<inventory.length;a++){
+                if(inventory[a].id == 1){
+                    //console.log(slot1.x);
+                    //slot1.img.realSrc = "assets/daggerDrop.png";
+                    //slot1.render();
+                }
+            }
             for(var a=0;a<rooms.length;a++){
                 for(var b=0;b<rooms[a].tiles.length;b++){
                     var distance = abs(rooms[a].tiles[b].pos.x - player.pos.x)+abs(rooms[a].tiles[b].pos.y - player.pos.y);
@@ -119,7 +129,6 @@ function draw() {
                 pickUpButton.x = clickPos.x;
                 pickUpButton.y = clickPos.y;
                 pickUpButton.render();
-                console.log(pickUpButton);
             }
         }
     }else{
@@ -130,9 +139,23 @@ function draw() {
 }
 
 function mouseClicked(){
+    var done = false;
+
+    if(clickOptionsVisible == true){
+        for(var a=0;a<clickOptions.length;a++){
+            if(clickOptions[a].type == "pickUp"){
+                if(mouseIsContainedInGui(pickUpButton.x*100,pickUpButton.y*100,(pickUpButton.x+1)*100,(pickUpButton.y+0.3)*100)){
+                    inventory.push(new item("weapon",1));
+                    mapItems[selectedItem].sprite.img.style.visibility = 'hidden';
+                    mapItems[selectedItem].sprite.render();
+                    mapItems.splice(selectedItem,1);
+                }
+            }
+        }
+    }
+
     clickOptionsVisible = false;
     clickOptions.splice(0,clickOptions.length);
-    var done = false;
 
     for(var a=0;a<mapItems.length;a++){
         if(mouseIsContainedIn(mapItems[a].x*100,mapItems[a].y*100,mapItems[a].x*100+100,mapItems[a].y*100+100)){
@@ -140,6 +163,7 @@ function mouseClicked(){
                 clickOptions.push(new clickOption("pickUp"));
                 clickOptionsVisible = true;
                 clickPos = createVector(mapItems[a].x - player.pos.x+11,mapItems[a].y - player.pos.y+5); 
+                selectedItem = a;
                 mapItems[a].sprite.render(); 
             } 
         }
@@ -147,7 +171,7 @@ function mouseClicked(){
     for(var a=0;a<rooms.length;a++){
         for(var b=0;b<rooms[a].tiles.length;b++){
             if(mouseIsContainedIn(rooms[a].tiles[b].pos.x*100,rooms[a].tiles[b].pos.y*100,rooms[a].tiles[b].pos.x*100+100,rooms[a].tiles[b].pos.y*100+100)){
-                if(done==false){
+                if(done==false&&controlHeld==false){
                     var distance = round(abs(rooms[a].tiles[b].pos.x - player.pos.x)+abs(rooms[a].tiles[b].pos.y - player.pos.y));
                     if(distance<=5 && energy>=distance*2 && moveSelected == true && rooms[a].tiles[b].t != 'wall'){
                         player.pos = rooms[a].tiles[b].pos;  
