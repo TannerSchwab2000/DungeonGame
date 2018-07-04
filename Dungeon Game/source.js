@@ -11,6 +11,7 @@ var slot5;
 var slot6;
 var slot7;
 var slot8;
+var equippedSlot;
 var clickOptions = [];
 var clickPos;
 var clickOption1;
@@ -24,6 +25,7 @@ var moveButton;
 var attackButton;
 var endTurnButton;
 var pickUpButton;
+var equipButton;
 var energyBackground;
 var energyBar;
 var energyText;
@@ -38,6 +40,7 @@ var attackSelected = false;
 var controlHeld = false;
 var clickOptionsVisible = false;
 var selectedItem;
+var equippedItem;
 
 function setup() {
     console.log(windowWidth,windowHeight);
@@ -91,6 +94,8 @@ function setup() {
     images.push(deathBackground);
     pickUpButton = new img("assets/pick_up_button.png",-1,0,1,0.3,images.length,3);
     images.push(pickUpButton);
+    equipButton = new img("assets/equip_button.png",-1,0,1,0.3,images.length,3);
+    images.push(equipButton);
     slot1 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100),1,1,images.length,1);
     images.push(slot1);
     slot2 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100),1,1,images.length,1);
@@ -106,6 +111,9 @@ function setup() {
     slot7 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100)+2,1,1,images.length,1);
     images.push(slot1);
     slot8 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100)+2,1,1,images.length,1);
+    images.push(slot1);
+    equippedSlot = new img("assets/inventory_block.png",6,round((windowHeight-300)/100)+1,1,1,images.length,1);
+    equippedSlot.img.style.visibility = "hidden";
     images.push(slot1);
 }
 
@@ -151,10 +159,16 @@ function draw() {
                 pickUpButton.x = clickPos.x;
                 pickUpButton.y = clickPos.y;
                 pickUpButton.render();
+            }else if(clickOptions[a].type == "equip"){
+                equipButton.img.style.visibility = "visible";
+                equipButton.x = clickPos.x;
+                equipButton.y = clickPos.y;
+                equipButton.render();
             }
         }
     }else{
         pickUpButton.img.style.visibility = "hidden";
+        equipButton.img.style.visibility = "hidden";
     }
     
     
@@ -172,6 +186,19 @@ function mouseClicked(){
                     mapItems[selectedItem].sprite.render();
                     mapItems.splice(selectedItem,1);
                 }
+            }else if(clickOptions[a].type == "equip"){
+                if(mouseIsContainedInGui(equipButton.x*100,equipButton.y*100,(equipButton.x+1)*100,(equipButton.y+0.3)*100)){
+                    equippedItem = inventory[selectedItem];
+                    inventory.splice(selectedItem,1);
+                    var b = selectedItem+1;
+                    var c = b.toString();
+                    window['slot'+c].img.style.visibility = 'hidden';
+                    window['slot'+c].render();
+                    equippedSlot.img.style.visibility = "visible";
+                    equippedSlot.img.realSrc = "assets/daggerDrop.png";
+                    equippedSlot.render();
+
+                }
             }
         }
     }
@@ -179,6 +206,18 @@ function mouseClicked(){
     clickOptionsVisible = false;
     clickOptions.splice(0,clickOptions.length);
 
+    for(var a=0;a<7;a++){
+        var b = a+1;
+        var c = b.toString();  
+        if(mouseIsContainedInGui(window['slot'+c].x*100,window['slot'+c].y*100,window['slot'+c].x*100+100,window['slot'+c].y*100+100)){
+            if(controlHeld == true){
+                clickOptions.push(new clickOption("equip"));
+                clickOptionsVisible = true;
+                clickPos = createVector(window['slot'+c].x,window['slot'+c].y); 
+                selectedItem = a;
+            }
+        }
+    }
     for(var a=0;a<mapItems.length;a++){
         if(mouseIsContainedIn(mapItems[a].x*100,mapItems[a].y*100,mapItems[a].x*100+100,mapItems[a].y*100+100)){
             if(controlHeld == true){
