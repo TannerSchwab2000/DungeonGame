@@ -4,6 +4,13 @@ var creatures = [];
 var mapItems = [];
 var inventory = [];
 var slot1;
+var slot2;
+var slot3;
+var slot4;
+var slot5;
+var slot6;
+var slot7;
+var slot8;
 var clickOptions = [];
 var clickPos;
 var clickOption1;
@@ -86,6 +93,20 @@ function setup() {
     images.push(pickUpButton);
     slot1 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100),1,1,images.length,1);
     images.push(slot1);
+    slot2 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100),1,1,images.length,1);
+    images.push(slot1);
+    slot3 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100),1,1,images.length,1);
+    images.push(slot1);
+    slot4 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100)+1,1,1,images.length,1);
+    images.push(slot1);
+    slot5 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100)+1,1,1,images.length,1);
+    images.push(slot1);
+    slot6 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100)+2,1,1,images.length,1);
+    images.push(slot1);
+    slot7 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100)+2,1,1,images.length,1);
+    images.push(slot1);
+    slot8 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100)+2,1,1,images.length,1);
+    images.push(slot1);
 }
 
 function draw() {
@@ -97,9 +118,10 @@ function draw() {
             lastTick = Date.now();
             for(var a=0;a<inventory.length;a++){
                 if(inventory[a].id == 1){
-                    //console.log(slot1.x);
-                    //slot1.img.realSrc = "assets/daggerDrop.png";
-                    //slot1.render();
+                    var b = a+1;
+                    var c = b.toString();
+                    window['slot'+c].img.realSrc = "assets/daggerDrop.png";
+                    window['slot'+c].render();
                 }
             }
             for(var a=0;a<rooms.length;a++){
@@ -179,6 +201,13 @@ function mouseClicked(){
                         energy = energy - distance*2; 
                         if(rooms[a].tiles[b].t == 'door'){
                             if(rooms[a].tiles[b].relativeX == 9 && roomIsPresentAt(rooms[a].pos.x+9,rooms[a].pos.y) == false ){//Right
+                                rand = round(random(1,2));
+                                if(rand == 1){
+                                    goblin2 = new creature("assets/goblin.png",rooms[a].pos.x+14,rooms[a].pos.y+5,3,3);
+                                    creatures.push(goblin2); 
+                                }
+                                
+
                                 rand = round(random(1,5));//1,5
                                 if(rand == 1){
                                     rooms[a].tiles[b].sprite.x = -9999;
@@ -306,6 +335,7 @@ function mouseClicked(){
                                         }
                                     }
                                 }
+
                             }else if(rooms[a].tiles[b].relativeY == 9 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y+9) == false ){ //Down
                                 rand = round(random(1,5));//1,5
                                 if(rand == 1){ //Opening
