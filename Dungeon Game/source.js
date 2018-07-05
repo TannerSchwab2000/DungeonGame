@@ -17,7 +17,7 @@ var clickPos;
 var clickOption1;
 var player;
 var lastTick = Date.now();
-var updateRate = 0.05;
+var updateRate = 0.01;
 var move = false;
 var health = 10;
 var energy = 10;
@@ -41,6 +41,10 @@ var controlHeld = false;
 var clickOptionsVisible = false;
 var selectedItem;
 var equippedItem;
+var damage;
+var startTime;
+var waitTime;
+var hider;
 
 function setup() {
     console.log(windowWidth,windowHeight);
@@ -99,22 +103,24 @@ function setup() {
     slot1 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100),1,1,images.length,1);
     images.push(slot1);
     slot2 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100),1,1,images.length,1);
-    images.push(slot1);
+    images.push(slot2);
     slot3 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100),1,1,images.length,1);
-    images.push(slot1);
+    images.push(slot3);
     slot4 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100)+1,1,1,images.length,1);
-    images.push(slot1);
+    images.push(slot4);
     slot5 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100)+1,1,1,images.length,1);
-    images.push(slot1);
+    images.push(slot5);
     slot6 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100)+2,1,1,images.length,1);
-    images.push(slot1);
+    images.push(slot6);
     slot7 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100)+2,1,1,images.length,1);
-    images.push(slot1);
+    images.push(slot7);
     slot8 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100)+2,1,1,images.length,1);
-    images.push(slot1);
+    images.push(slot8);
     equippedSlot = new img("assets/inventory_block.png",6,round((windowHeight-300)/100)+1,1,1,images.length,1);
     equippedSlot.img.style.visibility = "hidden";
-    images.push(slot1);
+    images.push(equippedSlot);
+    damage = new img("assets/minusOne.png",-1,0,1,1,images.length,3);
+    images.push(equipButton);
 }
 
 function draw() {
@@ -124,6 +130,15 @@ function draw() {
         player.render();
         if(Date.now()-lastTick>updateRate*1000){
             lastTick = Date.now();
+
+            if(startTime != null && waitTime != null && hider != null){
+                if((Date.now()-startTime)/1000 > waitTime){
+                    //hider.img.style.visibility = "hidden";
+                    hider.x = -99999;
+                    hider.render();
+                }
+            }
+
             for(var a=0;a<inventory.length;a++){
                 if(inventory[a].id == 1){
                     var b = a+1;
@@ -192,7 +207,7 @@ function mouseClicked(){
                     inventory.splice(selectedItem,1);
                     var b = selectedItem+1;
                     var c = b.toString();
-                    window['slot'+c].img.style.visibility = 'hidden';
+                    window['slot'+c].img.realSrc = 'assets/inventory_block.png';
                     window['slot'+c].render();
                     equippedSlot.img.style.visibility = "visible";
                     equippedSlot.img.realSrc = "assets/daggerDrop.png";
@@ -376,6 +391,12 @@ function mouseClicked(){
                                 }
 
                             }else if(rooms[a].tiles[b].relativeY == 9 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y+9) == false ){ //Down
+                                rand = round(random(1,2));
+                                if(rand == 1){
+                                    goblin2 = new creature("assets/goblin.png",rooms[a].pos.x+5,rooms[a].pos.y+14,3,3);
+                                    creatures.push(goblin2); 
+                                }
+
                                 rand = round(random(1,5));//1,5
                                 if(rand == 1){ //Opening
                                     rooms[a].tiles[b].sprite.x = -9999;
@@ -505,6 +526,12 @@ function mouseClicked(){
                                     }
                                 }
                             }else if(rooms[a].tiles[b].relativeX == 0 && roomIsPresentAt(rooms[a].pos.x-9,rooms[a].pos.y) == false ){//Left
+                                rand = round(random(1,2));
+                                if(rand == 1){
+                                    goblin2 = new creature("assets/goblin.png",rooms[a].pos.x-5,rooms[a].pos.y+5,3,3);
+                                    creatures.push(goblin2); 
+                                }
+
                                 rand = round(random(1,5));//1,5
                                 if(rand == 1){
                                     rooms[a].tiles[b].sprite.x = -9999;
@@ -633,6 +660,13 @@ function mouseClicked(){
                                     }
                                 }
                             }else if(rooms[a].tiles[b].relativeY == 0 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y-9) == false ){ //Up
+                                rand = round(random(1,2));
+                                if(rand == 1){
+                                    goblin2 = new creature("assets/goblin.png",rooms[a].pos.x+5,rooms[a].pos.y-10,3,3);
+                                    creatures.push(goblin2); 
+                                }    
+
+
                                 rand = round(random(1,5));//1,5
                                 if(rand == 1){
                                     rooms[a].tiles[b].sprite.x = -9999;
@@ -768,8 +802,27 @@ function mouseClicked(){
                     if(distance<=1&&energy>4&&attackSelected==true){
                         for(var c=0;c<creatures.length;c++){
                             if(creatures[c].pos.x == rooms[a].tiles[b].pos.x && creatures[c].pos.y == rooms[a].tiles[b].pos.y){
-                                energy-=5;
-                                creatures[c].health--;
+                                if(equippedItem!=null){
+                                    if(equippedItem.id == 1){
+                                        energy-=5;
+                                        creatures[c].health-=2;  
+                                        damage.img.realSrc = "assets/minusTwo.png"
+                                        damage.x = creatures[c].pos.x - player.pos.x+11;
+                                        damage.y = creatures[c].pos.y - player.pos.y+5;
+                                        damage.img.visibility = "visible";
+                                        damage.render();
+                                        hide(damage,1);
+                                    }
+                                }else{
+                                    energy-=5;
+                                    creatures[c].health--; 
+                                    damage.img.realSrc = "assets/minusOne.png"   
+                                    damage.x = creatures[c].pos.x - player.pos.x+11;
+                                    damage.y = creatures[c].pos.y - player.pos.y+5;
+                                    damage.img.visibility = "visible";
+                                    damage.render();
+                                    hide(damage,1);
+                                }
                             }
                         }
                     }
@@ -866,5 +919,11 @@ function clickOption(type){
     
     
     
+}
+
+function hide(h,t){
+    startTime = Date.now();
+    waitTime = t;
+    hider = h;
 }
 
