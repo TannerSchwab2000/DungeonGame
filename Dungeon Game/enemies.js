@@ -3,6 +3,7 @@ var done;
 
 function creature(s,x,y,h,e){
     this.pos = createVector(x,y);
+    this.healthBar = new img('assets/creature_health.png',this.pos.x,this.pos.y,1,1,images.length,1);
     this.sprite = new img(s,this.pos.x,this.pos.y,1,1,images.length,1);
     this.maxEnergy = e;
     this.health = h;
@@ -24,6 +25,11 @@ function creature(s,x,y,h,e){
 
 
     this.render = function(){
+        this.healthBar.x = this.pos.x;
+        this.healthBar.y = this.pos.y;
+        this.healthBar.img.width = 100/3 *this.health;
+        this.healthBar.render();
+
     	if(this.health < 1){
             if(this.itemSprite1 != null){
                 var drop = new mapItem("assets/daggerDrop.png",this.pos.x,this.pos.y);
@@ -72,7 +78,7 @@ function creature(s,x,y,h,e){
                     var done = false;
                     var choices = [];
 
-                    if(up==true && done==false && wallIsPresentAt(this.pos.x,this.pos.y-1)==false){
+                    if(up==true && done==false && wallIsPresentAt(this.pos.x,this.pos.y-1)==false && creatureIsPresentAt(this.pos.x,this.pos.y-1)==false){
                         choices.push(1);   
                     } 
                     if(right==true && done==false && wallIsPresentAt(this.pos.x+1,this.pos.y)==false){

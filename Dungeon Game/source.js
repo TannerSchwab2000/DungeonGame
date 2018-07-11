@@ -26,6 +26,7 @@ var attackButton;
 var endTurnButton;
 var pickUpButton;
 var equipButton;
+var unequipButton;
 var energyBackground;
 var energyBar;
 var energyText;
@@ -45,6 +46,7 @@ var damage;
 var startTime;
 var waitTime;
 var hider;
+var itemSprite1;
 
 function setup() {
     console.log(windowWidth,windowHeight);
@@ -71,6 +73,8 @@ function setup() {
     goblin = new creature("assets/goblin.png",8,2,3,3);
     creatures.push(goblin);
         
+
+
     background = new img("assets/background.png",0,0,windowWidth/100,windowHeight/100,images.length,-1);
     images.push(background);
     moveButton = new img("assets/move_button.png",1,round((windowHeight-300)/100),1.75,0.75,images.length,1);
@@ -100,6 +104,8 @@ function setup() {
     images.push(pickUpButton);
     equipButton = new img("assets/equip_button.png",-1,0,1,0.3,images.length,3);
     images.push(equipButton);
+    unequipButton = new img("assets/unequip_button.png",-1,0,1,0.3,images.length,3);
+    images.push(unequipButton);
     slot1 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100),1,1,images.length,1);
     images.push(slot1);
     slot2 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100),1,1,images.length,1);
@@ -121,6 +127,9 @@ function setup() {
     images.push(equippedSlot);
     damage = new img("assets/minusOne.png",-1,0,1,1,images.length,3);
     images.push(equipButton);
+    itemSprite1 = new img("assets/playerDagger.png",11,5,1,1,images.length,2);
+    itemSprite1.img.style.visibility = "hidden";
+    images.push(itemSprite1);
 }
 
 function draw() {
@@ -179,11 +188,17 @@ function draw() {
                 equipButton.x = clickPos.x;
                 equipButton.y = clickPos.y;
                 equipButton.render();
+            }else if(clickOptions[a].type == "unequip"){
+                unequipButton.img.style.visibility = "visible";
+                unequipButton.x = clickPos.x;
+                unequipButton.y = clickPos.y;
+                unequipButton.render();
             }
         }
     }else{
         pickUpButton.img.style.visibility = "hidden";
         equipButton.img.style.visibility = "hidden";
+        unequipButton.img.style.visibility = "hidden";
     }
     
     
@@ -191,7 +206,6 @@ function draw() {
 
 function mouseClicked(){
     var done = false;
-
     if(clickOptionsVisible == true){
         for(var a=0;a<clickOptions.length;a++){
             if(clickOptions[a].type == "pickUp"){
@@ -212,7 +226,17 @@ function mouseClicked(){
                     equippedSlot.img.style.visibility = "visible";
                     equippedSlot.img.realSrc = "assets/daggerDrop.png";
                     equippedSlot.render();
-
+                    itemSprite1.img.style.visibility = "visible";
+                }
+            }else if(clickOptions[a].type == "unequip"){
+                if(mouseIsContainedInGui(unequipButton.x*100,unequipButton.y*100,(unequipButton.x+1)*100,(unequipButton.y+0.3)*100)){
+                    equippedSlot.img.realSrc = 'assets/equipped_slot.png';
+                    equippedSlot.render();
+                    if(inventory.length<8){
+                        inventory.push(equippedItem);
+                    }
+                    equippedItem = null;
+                    itemSprite1.img.style.visibility = "hidden";
                 }
             }
         }
@@ -221,15 +245,26 @@ function mouseClicked(){
     clickOptionsVisible = false;
     clickOptions.splice(0,clickOptions.length);
 
+    if(mouseIsContainedInGui(equippedSlot.x*100,equippedSlot.y*100,equippedSlot.x*100+100,equippedSlot.y*100+100)){
+        if(controlHeld == true && equippedItem != null){
+            clickOptions.push(new clickOption("unequip"));
+            clickOptionsVisible = true;
+            clickPos = createVector(equippedSlot.x,equippedSlot.y); 
+            selectedItem = 0;
+        }
+    }
+
     for(var a=0;a<7;a++){
         var b = a+1;
         var c = b.toString();  
         if(mouseIsContainedInGui(window['slot'+c].x*100,window['slot'+c].y*100,window['slot'+c].x*100+100,window['slot'+c].y*100+100)){
             if(controlHeld == true){
-                clickOptions.push(new clickOption("equip"));
-                clickOptionsVisible = true;
-                clickPos = createVector(window['slot'+c].x,window['slot'+c].y); 
-                selectedItem = a;
+                if(inventory[a] != null){
+                    clickOptions.push(new clickOption("equip"));
+                    clickOptionsVisible = true;
+                    clickPos = createVector(window['slot'+c].x,window['slot'+c].y); 
+                    selectedItem = a;   
+                }  
             }
         }
     }
@@ -662,7 +697,7 @@ function mouseClicked(){
                             }else if(rooms[a].tiles[b].relativeY == 0 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y-9) == false ){ //Up
                                 rand = round(random(1,2));
                                 if(rand == 1){
-                                    goblin2 = new creature("assets/goblin.png",rooms[a].pos.x+5,rooms[a].pos.y-10,3,3);
+                                    goblin2 = new creature("assets/goblin.png",rooms[a].pos.x+5,rooms[a].pos.y-5,3,3);
                                     creatures.push(goblin2); 
                                 }    
 
@@ -890,6 +925,15 @@ function wallIsPresentAt(x,y){
             if(rooms[a].tiles[b].pos.x == x && rooms[a].tiles[b].pos.y == y && rooms[a].tiles[b].t == "wall"){
                 return true;
             }
+        }
+    }
+    return false;
+}
+
+function creatureIsPresentAt(x,y){
+    for(var a=0;a<creatures.length;a++){
+        if(creatures[a].pos.x == x && creatures[a].pos.y == y){
+            return true;
         }
     }
     return false;
