@@ -8,7 +8,7 @@ function player(){
     	if(equippedItem != null){
 	    	if(equippedItem.id == 1){
 	           itemSprite1.img.visibility = "visible";
-               itemSprite1.img.realSrc = "assets/playerDagger.png";      
+               itemSprite1.img.realSrc = "assets/player_dagger.png";      
 		       itemSprite1.render();
 	    	}	
     	}

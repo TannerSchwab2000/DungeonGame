@@ -20,6 +20,8 @@ var lastTick = Date.now();
 var updateRate = 0.01;
 var move = false;
 var health = 10;
+var maxArmor = 0;
+var armor = 0;
 var energy = 10;
 var moveButton;
 var attackButton;
@@ -30,6 +32,7 @@ var unequipButton;
 var energyBackground;
 var energyBar;
 var energyText;
+var armorBar;
 var healthBackground;
 var healthBar;
 var healthText;
@@ -47,6 +50,9 @@ var startTime;
 var waitTime;
 var hider;
 var itemSprite1;
+var itemSprite2;
+var head;
+
 
 function setup() {
     console.log(windowWidth,windowHeight);
@@ -70,8 +76,8 @@ function setup() {
     }
 
     player = new player();
-    goblin = new creature("assets/goblin.png",8,2,3,3);
-    creatures.push(goblin);
+    rat = new creature("assets/rat.png",8,2,2,3);
+    creatures.push(rat);
         
 
 
@@ -97,6 +103,10 @@ function setup() {
     images.push(inventoryBackground);
     healthText = new img("assets/health_text.png",3,round((windowHeight-300)/100),1.75,0.75,images.length,1);
     images.push(healthText);
+    armorBar = new img("assets/armor.png",3,round((windowHeight-300)/100),1.75,0.75,images.length,1);
+    images.push(armorBar);
+    armorBarText = new img("assets/armor_text.png",3,round((windowHeight-300)/100),1.75,0.75,images.length,1);
+    images.push(armorBarText);
     deathBackground = new img("assets/death_background.png",0,0,windowWidth/100,windowHeight/100,images.length,5);
     deathBackground.img.style.visibility = "hidden";
     images.push(deathBackground);
@@ -106,36 +116,49 @@ function setup() {
     images.push(equipButton);
     unequipButton = new img("assets/unequip_button.png",-1,0,1,0.3,images.length,3);
     images.push(unequipButton);
-    slot1 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100),1,1,images.length,1);
+    slot1 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100),1,1,images.length,2);
     images.push(slot1);
-    slot2 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100),1,1,images.length,1);
+    slot2 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100),1,1,images.length,2);
     images.push(slot2);
-    slot3 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100),1,1,images.length,1);
+    slot3 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100),1,1,images.length,2);
     images.push(slot3);
-    slot4 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100)+1,1,1,images.length,1);
+    slot4 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100)+1,1,1,images.length,2);
     images.push(slot4);
-    slot5 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100)+1,1,1,images.length,1);
+    slot5 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100)+1,1,1,images.length,2);
     images.push(slot5);
-    slot6 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100)+2,1,1,images.length,1);
+    slot6 = new img("assets/inventory_block.png",5,round((windowHeight-300)/100)+2,1,1,images.length,2);
     images.push(slot6);
-    slot7 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100)+2,1,1,images.length,1);
+    slot7 = new img("assets/inventory_block.png",6,round((windowHeight-300)/100)+2,1,1,images.length,2);
     images.push(slot7);
-    slot8 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100)+2,1,1,images.length,1);
+    slot8 = new img("assets/inventory_block.png",7,round((windowHeight-300)/100)+2,1,1,images.length,2);
     images.push(slot8);
-    equippedSlot = new img("assets/inventory_block.png",6,round((windowHeight-300)/100)+1,1,1,images.length,1);
+    equippedSlot = new img("assets/inventory_block.png",6,round((windowHeight-300)/100)+1,1,1,images.length,2);
     equippedSlot.img.style.visibility = "hidden";
     images.push(equippedSlot);
     damage = new img("assets/minusOne.png",-1,0,1,1,images.length,3);
     images.push(equipButton);
-    itemSprite1 = new img("assets/playerDagger.png",11,5,1,1,images.length,2);
+    itemSprite1 = new img("assets/player_dagger.png",11,5,1,1,images.length,2);
     itemSprite1.img.style.visibility = "hidden";
     images.push(itemSprite1);
+    itemSprite2 = new img("assets/leather_hat.png",11,5,1,1,images.length,2);
+    itemSprite2.img.style.visibility = "hidden";
+    images.push(itemSprite2);
 }
 
 function draw() {
     if(health>0){
         healthBar.img.width = 17.5*health;
+        armorBar.img.width = 17.5*armor;
         energyBar.img.width = 17.5*energy;
+
+        if(armor < 1){
+            armorBarText.img.style.visibility = "hidden";
+            healthText.img.style.visibility = "visible";
+        }else{
+            armorBarText.img.style.visibility = "visible"; 
+            healthText.img.style.visibility = "hidden";
+        }
+
         player.render();
         if(Date.now()-lastTick>updateRate*1000){
             lastTick = Date.now();
@@ -147,14 +170,26 @@ function draw() {
                     hider.render();
                 }
             }
-
-            for(var a=0;a<inventory.length;a++){
-                if(inventory[a].id == 1){
-                    var b = a+1;
-                    var c = b.toString();
-                    window['slot'+c].img.realSrc = "assets/daggerDrop.png";
+            for(var a=0;a<8;a++){
+                var b = a+1;
+                var c = b.toString();
+                if(inventory[a] != null){
+                    if(inventory[a].id == 1){
+                        window['slot'+c].img.realSrc = "assets/dagger_drop.png";
+                        window['slot'+c].render();
+                    }else if(inventory[a].id == 2){
+                        window['slot'+c].img.realSrc = "assets/leather_hat_drop.png";
+                        window['slot'+c].render();
+                    }else{
+                        window['slot'+c].img.realSrc = 'assets/inventory_block.png';
+                        window['slot'+c].render();
+                    }    
+                }else{
+                    window['slot'+c].img.realSrc = 'assets/inventory_block.png';
                     window['slot'+c].render();
                 }
+                
+
             }
             for(var a=0;a<rooms.length;a++){
                 for(var b=0;b<rooms[a].tiles.length;b++){
@@ -210,23 +245,50 @@ function mouseClicked(){
         for(var a=0;a<clickOptions.length;a++){
             if(clickOptions[a].type == "pickUp"){
                 if(mouseIsContainedInGui(pickUpButton.x*100,pickUpButton.y*100,(pickUpButton.x+1)*100,(pickUpButton.y+0.3)*100)){
-                    inventory.push(new item("weapon",1));
-                    mapItems[selectedItem].sprite.img.style.visibility = 'hidden';
-                    mapItems[selectedItem].sprite.render();
-                    mapItems.splice(selectedItem,1);
+                    if(mapItems[selectedItem] != null){
+                        if(mapItems[selectedItem].type == "weapon"){
+                            inventory.push(new item("weapon",1));
+                            mapItems[selectedItem].sprite.img.style.visibility = 'hidden';
+                            mapItems[selectedItem].sprite.render();
+                            mapItems.splice(selectedItem,1);
+                        }else if(mapItems[selectedItem].type == 'helmet'){
+                            inventory.push(new item("helmet",2));
+                            mapItems[selectedItem].sprite.img.style.visibility = 'hidden';
+                            mapItems[selectedItem].sprite.render();
+                            mapItems.splice(selectedItem,1);
+                        }     
+                    }
+                    
                 }
             }else if(clickOptions[a].type == "equip"){
                 if(mouseIsContainedInGui(equipButton.x*100,equipButton.y*100,(equipButton.x+1)*100,(equipButton.y+0.3)*100)){
-                    equippedItem = inventory[selectedItem];
-                    inventory.splice(selectedItem,1);
-                    var b = selectedItem+1;
-                    var c = b.toString();
-                    window['slot'+c].img.realSrc = 'assets/inventory_block.png';
-                    window['slot'+c].render();
-                    equippedSlot.img.style.visibility = "visible";
-                    equippedSlot.img.realSrc = "assets/daggerDrop.png";
-                    equippedSlot.render();
-                    itemSprite1.img.style.visibility = "visible";
+                    if(inventory[selectedItem] != null){
+                        console.log(inventory[selectedItem]);
+                        if(inventory[selectedItem].type == "weapon"){
+                            equippedItem = inventory[selectedItem];
+                            inventory.splice(selectedItem,1);
+                            var b = selectedItem+1;
+                            var c = b.toString();
+                            window['slot'+c].img.realSrc = 'assets/inventory_block.png';
+                            window['slot'+c].render();
+                            equippedSlot.img.style.visibility = "visible";
+                            equippedSlot.img.realSrc = "assets/dagger_drop.png";
+                            equippedSlot.render();
+                            itemSprite1.img.style.visibility = "visible";    
+                        }else if(inventory[selectedItem].type == 'helmet'){
+                            console.log("leather helmet equipped");
+                            maxArmor = 1;
+                            armor = 1;
+                            head = 'leatherHat';
+                            inventory.splice(selectedItem,1);
+                            var b = selectedItem+1;
+                            var c = b.toString();
+                            window['slot'+c].img.realSrc = 'assets/inventory_block.png';
+                            window['slot'+c].render();
+                            itemSprite2.img.style.visibility = "visible";  
+                        }     
+                    }
+                    
                 }
             }else if(clickOptions[a].type == "unequip"){
                 if(mouseIsContainedInGui(unequipButton.x*100,unequipButton.y*100,(unequipButton.x+1)*100,(unequipButton.y+0.3)*100)){
@@ -237,6 +299,7 @@ function mouseClicked(){
                     }
                     equippedItem = null;
                     itemSprite1.img.style.visibility = "hidden";
+
                 }
             }
         }
@@ -258,7 +321,7 @@ function mouseClicked(){
         var b = a+1;
         var c = b.toString();  
         if(mouseIsContainedInGui(window['slot'+c].x*100,window['slot'+c].y*100,window['slot'+c].x*100+100,window['slot'+c].y*100+100)){
-            if(controlHeld == true){
+            if(controlHeld == true && clickOptionsVisible == false){
                 if(inventory[a] != null){
                     clickOptions.push(new clickOption("equip"));
                     clickOptionsVisible = true;
@@ -292,8 +355,8 @@ function mouseClicked(){
                             if(rooms[a].tiles[b].relativeX == 9 && roomIsPresentAt(rooms[a].pos.x+9,rooms[a].pos.y) == false ){//Right
                                 rand = round(random(1,2));
                                 if(rand == 1){
-                                    goblin2 = new creature("assets/goblin.png",rooms[a].pos.x+14,rooms[a].pos.y+5,3,3);
-                                    creatures.push(goblin2); 
+                                    goblin = new creature("assets/goblin.png",rooms[a].pos.x+14,rooms[a].pos.y+5,4,5);
+                                    creatures.push(goblin); 
                                 }
                                 
 
@@ -321,7 +384,7 @@ function mouseClicked(){
                                             newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,1+d,newRoom,'floor'));    
                                         }  
                                     }    
-                                }else if(rand == 2){
+                                }else if(rand == 2){ //Bedroom
                                     rooms[a].tiles[b].sprite.x = -9999;
                             
                                     var newRoom = new room(rooms[a].pos.x+9,rooms[a].pos.y);
@@ -344,6 +407,10 @@ function mouseClicked(){
                                                 newRoom.tiles.push(new tile("assets/stone_wall.png",1+c,1+d,newRoom,'wall'));
                                             }else if((1+c == 2 && 1+d == 3)||(1+c == 5 && 1+d == 3)||(1+c == 8 && 1+d == 3)||(1+c == 2 && 1+d == 6)||(1+c == 5 && 1+d == 6)||(1+c == 8 && 1+d == 6)){
                                                 newRoom.tiles.push(new tile("assets/door.png",1+c,1+d,newRoom,'door'));
+                                            }else if(1+c == 1 && 1+d == 1||1+c == 4 && 1+d == 1||1+c == 7 && 1+d == 1||1+c == 1 && 1+d == 8||1+c == 4 && 1+d == 8||1+c == 7 && 1+d == 8){
+                                                newRoom.tiles.push(new tile("assets/cabinet.png",1+c,1+d,newRoom,'floor'));
+                                            }else if(1+c == 2 && 1+d == 1||1+c == 5 && 1+d == 1||1+c == 8 && 1+d == 1||1+c == 2 && 1+d == 8||1+c == 5 && 1+d == 8||1+c == 8 && 1+d == 8){
+                                                newRoom.tiles.push(new tile("assets/bed.png",1+c,1+d,newRoom,'floor'));
                                             }else{
                                                 newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,1+d,newRoom,'floor'));        
                                             }
@@ -428,8 +495,8 @@ function mouseClicked(){
                             }else if(rooms[a].tiles[b].relativeY == 9 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y+9) == false ){ //Down
                                 rand = round(random(1,2));
                                 if(rand == 1){
-                                    goblin2 = new creature("assets/goblin.png",rooms[a].pos.x+5,rooms[a].pos.y+14,3,3);
-                                    creatures.push(goblin2); 
+                                    goblin = new creature("assets/goblin.png",rooms[a].pos.x+5,rooms[a].pos.y+14,4,5);
+                                    creatures.push(goblin); 
                                 }
 
                                 rand = round(random(1,5));//1,5
@@ -480,6 +547,10 @@ function mouseClicked(){
                                                 newRoom.tiles.push(new tile("assets/stone_wall.png",1+c,1+d,newRoom,'wall'));
                                             }else if((1+c == 3 && 1+d == 2)||(1+c == 6 && 1+d == 2)||(1+c == 3 && 1+d == 5)||(1+c == 6 && 1+d == 5)||(1+c == 3 && 1+d == 8)||(1+c == 6 && 1+d == 8)){
                                                 newRoom.tiles.push(new tile("assets/door.png",1+c,1+d,newRoom,'door'));
+                                            }else if(1+d == 1 && 1+c == 1||1+d == 4 && 1+c == 1||1+d == 7 && 1+c == 1||1+d == 1 && 1+c == 8||1+d == 4 && 1+c == 8||1+d == 7 && 1+c == 8){
+                                                newRoom.tiles.push(new tile("assets/cabinet.png",1+c,1+d,newRoom,'floor'));
+                                            }else if(1+d == 2 && 1+c == 1||1+d == 5 && 1+c == 1||1+d == 8 && 1+c == 1||1+d == 2 && 1+c == 8||1+d == 5 && 1+c == 8||1+d == 8 && 1+c == 8){
+                                                newRoom.tiles.push(new tile("assets/bed.png",1+c,1+d,newRoom,'floor'));
                                             }else{
                                                 newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,1+d,newRoom,'floor'));        
                                             }
@@ -563,8 +634,8 @@ function mouseClicked(){
                             }else if(rooms[a].tiles[b].relativeX == 0 && roomIsPresentAt(rooms[a].pos.x-9,rooms[a].pos.y) == false ){//Left
                                 rand = round(random(1,2));
                                 if(rand == 1){
-                                    goblin2 = new creature("assets/goblin.png",rooms[a].pos.x-5,rooms[a].pos.y+5,3,3);
-                                    creatures.push(goblin2); 
+                                    goblin = new creature("assets/goblin.png",rooms[a].pos.x-5,rooms[a].pos.y+5,4,5);
+                                    creatures.push(goblin); 
                                 }
 
                                 rand = round(random(1,5));//1,5
@@ -591,7 +662,7 @@ function mouseClicked(){
                                             newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,1+d,newRoom,'floor'));    
                                         }  
                                     }    
-                                }else if(rand == 2){
+                                }else if(rand == 2){//Bedroom
                                     rooms[a].tiles[b].sprite.x = -9999;
                             
                                     var newRoom = new room(rooms[a].pos.x-9,rooms[a].pos.y);
@@ -614,6 +685,10 @@ function mouseClicked(){
                                                 newRoom.tiles.push(new tile("assets/stone_wall.png",1+c,1+d,newRoom,'wall'));
                                             }else if((1+c == 2 && 1+d == 3)||(1+c == 5 && 1+d == 3)||(1+c == 8 && 1+d == 3)||(1+c == 2 && 1+d == 6)||(1+c == 5 && 1+d == 6)||(1+c == 8 && 1+d == 6)){
                                                 newRoom.tiles.push(new tile("assets/door.png",1+c,1+d,newRoom,'door'));
+                                            }else if(1+c == 1 && 1+d == 1||1+c == 4 && 1+d == 1||1+c == 7 && 1+d == 1||1+c == 1 && 1+d == 8||1+c == 4 && 1+d == 8||1+c == 7 && 1+d == 8){
+                                                newRoom.tiles.push(new tile("assets/cabinet.png",1+c,1+d,newRoom,'floor'));
+                                            }else if(1+c == 2 && 1+d == 1||1+c == 5 && 1+d == 1||1+c == 8 && 1+d == 1||1+c == 2 && 1+d == 8||1+c == 5 && 1+d == 8||1+c == 8 && 1+d == 8){
+                                                newRoom.tiles.push(new tile("assets/bed.png",1+c,1+d,newRoom,'floor'));
                                             }else{
                                                 newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,1+d,newRoom,'floor'));        
                                             }
@@ -697,8 +772,8 @@ function mouseClicked(){
                             }else if(rooms[a].tiles[b].relativeY == 0 && roomIsPresentAt(rooms[a].pos.x,rooms[a].pos.y-9) == false ){ //Up
                                 rand = round(random(1,2));
                                 if(rand == 1){
-                                    goblin2 = new creature("assets/goblin.png",rooms[a].pos.x+5,rooms[a].pos.y-5,3,3);
-                                    creatures.push(goblin2); 
+                                    goblin = new creature("assets/goblin.png",rooms[a].pos.x+5,rooms[a].pos.y-5,4,5);
+                                    creatures.push(goblin); 
                                 }    
 
 
@@ -727,7 +802,7 @@ function mouseClicked(){
                                             newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,1+d,newRoom,'floor'));    
                                         }  
                                     }    
-                                }else if(rand == 2){
+                                }else if(rand == 2){//Bedroom
                                     rooms[a].tiles[b].sprite.x = -9999;
                             
                                     var newRoom = new room(rooms[a].pos.x,rooms[a].pos.y-9);
@@ -750,6 +825,10 @@ function mouseClicked(){
                                                 newRoom.tiles.push(new tile("assets/stone_wall.png",1+c,1+d,newRoom,'wall'));
                                             }else if((1+c == 3 && 1+d == 2)||(1+c == 6 && 1+d == 2)||(1+c == 3 && 1+d == 5)||(1+c == 6 && 1+d == 5)||(1+c == 3 && 1+d == 8)||(1+c == 6 && 1+d == 8)){
                                                 newRoom.tiles.push(new tile("assets/door.png",1+c,1+d,newRoom,'door'));
+                                            }else if(1+d == 1 && 1+c == 1||1+d == 4 && 1+c == 1||1+d == 7 && 1+c == 1||1+d == 1 && 1+c == 8||1+d == 4 && 1+c == 8||1+d == 7 && 1+c == 8){
+                                                newRoom.tiles.push(new tile("assets/cabinet.png",1+c,1+d,newRoom,'floor'));
+                                            }else if(1+d == 2 && 1+c == 1||1+d == 5 && 1+c == 1||1+d == 8 && 1+c == 1||1+d == 2 && 1+c == 8||1+d == 5 && 1+c == 8||1+d == 8 && 1+c == 8){
+                                                newRoom.tiles.push(new tile("assets/bed.png",1+c,1+d,newRoom,'floor'));
                                             }else{
                                                 newRoom.tiles.push(new tile("assets/stone_floor.png",1+c,1+d,newRoom,'floor'));        
                                             }
@@ -834,12 +913,12 @@ function mouseClicked(){
                             }   
                         }
                     }
-                    if(distance<=1&&energy>4&&attackSelected==true){
+                    if(distance<=1&&energy>1&&attackSelected==true){
                         for(var c=0;c<creatures.length;c++){
                             if(creatures[c].pos.x == rooms[a].tiles[b].pos.x && creatures[c].pos.y == rooms[a].tiles[b].pos.y){
                                 if(equippedItem!=null){
                                     if(equippedItem.id == 1){
-                                        energy-=5;
+                                        energy-=2;
                                         creatures[c].health-=2;  
                                         damage.img.realSrc = "assets/minusTwo.png"
                                         damage.x = creatures[c].pos.x - player.pos.x+11;
@@ -849,7 +928,7 @@ function mouseClicked(){
                                         hide(damage,1);
                                     }
                                 }else{
-                                    energy-=5;
+                                    energy-=2;
                                     creatures[c].health--; 
                                     damage.img.realSrc = "assets/minusOne.png"   
                                     damage.x = creatures[c].pos.x - player.pos.x+11;
@@ -867,6 +946,10 @@ function mouseClicked(){
     }
     if(mouseIsContainedInGui(endTurnButton.x*100,endTurnButton.y*100,endTurnButton.x*100+175,endTurnButton.y*100+75)){
         energy = 10;
+        armor = maxArmor;
+        if(health<10){
+            health++;
+        }
         moveSelected = false;
         attackSelected = false;
         for(var a=0;a<creatures.length;a++){
@@ -939,15 +1022,16 @@ function creatureIsPresentAt(x,y){
     return false;
 }
 
-function item(type,id){
-    this.type = type;
+function item(t,id){
+    this.type = t;
     this.id = id;
 }
 
-function mapItem(s,x,y){
+function mapItem(s,x,y,t){
     this.s = s;
     this.x = x;
     this.y = y;
+    this.type = t;
     this.sprite = new img(s,x,y,1,1,images.length,2);
     images.push(this.sprite);
     mapItems.push(this);
@@ -959,10 +1043,7 @@ function mapItem(s,x,y){
 }
 
 function clickOption(type){
-    this.type = type;
-    
-    
-    
+    this.type = type;  
 }
 
 function hide(h,t){

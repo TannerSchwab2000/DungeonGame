@@ -12,30 +12,50 @@ function creature(s,x,y,h,e){
     this.inventory = [];
     this.equipped;
     this.itemSprite1;
+    this.itemSprite2;
+    this.head;
     images.push(this.sprite);
 
-    var rand = round(random(1,2));
-    if(rand == 1){
-        var dagger = new item("weapon",1);
-        this.inventory.push(dagger);
-        this.equipped = dagger;
-        this.itemSprite1 = new img("assets/goblinDagger.png",this.pos.x,this.pos.y,1,1,images.length,2);
-        images.push(this.itemSprite1);
+    if(s == 'assets/goblin.png'){
+        var rand = round(random(1,2));
+        if(rand == 1){
+            var dagger = new item("weapon",1);
+            this.inventory.push(dagger);
+            this.equipped = dagger;
+            this.itemSprite1 = new img("assets/goblin_dagger.png",this.pos.x,this.pos.y,1,1,images.length,2);
+            images.push(this.itemSprite1);
+        }
+
+        var rand = round(random(1,2));
+        if(rand == 1){
+            var helm = new item("helmet",2);
+            this.inventory.push(helm);
+            this.head = helm;
+            this.itemSprite2 = new img("assets/goblin_leather_hat.png",this.pos.x,this.pos.y,1,1,images.length,2);
+            images.push(this.itemSprite2);
+        }    
     }
+    
 
 
     this.render = function(){
         this.healthBar.x = this.pos.x;
         this.healthBar.y = this.pos.y;
-        this.healthBar.img.width = 100/3 *this.health;
+        this.healthBar.img.width = 100/h *this.health;
         this.healthBar.render();
 
     	if(this.health < 1){
             if(this.itemSprite1 != null){
-                var drop = new mapItem("assets/daggerDrop.png",this.pos.x,this.pos.y);
+                var drop = new mapItem("assets/dagger_drop.png",this.pos.x,this.pos.y,'weapon');
                 this.itemSprite1.x = -99999;
                 this.itemSprite1.render();
                 this.itemSprite1 = null;
+            }
+            if(this.itemSprite2 != null){
+                var drop = new mapItem("assets/leather_hat_drop.png",this.pos.x,this.pos.y,'helmet');
+                this.itemSprite2.x = -99999;
+                this.itemSprite2.render();
+                this.itemSprite2 = null;
             }
     		this.pos = createVector(-99999,-99999);
             
@@ -44,6 +64,11 @@ function creature(s,x,y,h,e){
             this.itemSprite1.x = this.pos.x - player.pos.x+11;
             this.itemSprite1.y = this.pos.y - player.pos.y+5;
             this.itemSprite1.render();
+        }
+        if(this.itemSprite2 != null){
+            this.itemSprite2.x = this.pos.x - player.pos.x+11;
+            this.itemSprite2.y = this.pos.y - player.pos.y+5;
+            this.itemSprite2.render();
         }
         this.sprite.x = this.pos.x - player.pos.x+11;
         this.sprite.y = this.pos.y - player.pos.y+5;
@@ -54,12 +79,21 @@ function creature(s,x,y,h,e){
             var distance = abs(this.pos.x-player.pos.x)+abs(this.pos.y-player.pos.y);
             if(distance<2){
                 if(this.equipped == null){
-                    health--;    
+                    if(armor>0){
+                        armor--;  
+                    }else{
+                        health--; 
+                    }   
                 }else{
                     if(this.equipped.id == 1){
-                        health-=2;
+                        if(armor>0){
+                            armor-=2;  
+                        }else{
+                            health-=2; 
+                        } 
                     }
                 } 
+                this.energy--;
             }else{
                     var up = false;
                     var down = false;
@@ -97,50 +131,55 @@ function creature(s,x,y,h,e){
                     if(choice == 1){
                         this.pos.y--;
                         done = true;    
+                        this.energy--;
                     } 
                     if(choice == 2){
                         this.pos.x++;
                         done = true;   
+                        this.energy--;
                     }
                     if(choice == 3){
                         this.pos.y++;
                         done = true;   
+                        this.energy--;
                     }
                     if(choice == 4){
                         this.pos.x--;
                         done = true;  
+                        this.energy--;
                     }
 
                     choices = [];
 
 
                     if(done==false && (up == true || right == true || down == true || left == true)){
-                        for(var i=0;i<3;i++){
+                        for(var i=0;i<this.energy;i++){
                             var rand = round(random(1,4));
                             if(rand == 1 && wallIsPresentAt(this.pos.x,this.pos.y-1) == false){
                                 this.pos.y--;
                                 done = true;
+                                this.energy--;
                             }
                             if(rand == 2 && wallIsPresentAt(this.pos.x+1,this.pos.y) == false){
                                 this.pos.x++;
                                 done = true;
+                                this.energy--;
                             }
                             if(rand == 3 && wallIsPresentAt(this.pos.x,this.pos.y+1) == false){
                                 this.pos.y++;
                                 done = true;
+                                this.energy--;
                             }
                             if(rand == 4 && wallIsPresentAt(this.pos.x-1,this.pos.y) == false){
                                 this.pos.x--;
                                 done = true;
+                                this.energy--;
                             }    
                         }
                     }
-
-                
             }
 	        	
         }
-        this.energy--;
         
     }
 

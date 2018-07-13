@@ -23,7 +23,7 @@ function tile(s,x,y,parent,t){
                 this.sprite.green = false;   
             }    
         }else if(attackSelected==true){
-            if(distance <= 1 && this.t == "floor" && energy >= 5){
+            if(distance <= 1 && this.t == "floor" && energy >= 2){
                 this.sprite.red = true;
                 this.sprite.green = false;    
             }else{
